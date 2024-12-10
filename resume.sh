@@ -1,0 +1,1 @@
+pandoc assets/Resume.md -f markdown -t html -c assets/css/resume-stylesheet.css -s -o resume.html
