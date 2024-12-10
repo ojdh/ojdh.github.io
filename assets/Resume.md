@@ -35,8 +35,6 @@ subject: 'Resume'
 
 **Libraries**: NumPy, Pandas, Scikit-learn, TensorFlow, PyTorch, Keras, LlamaIndex, Langchain
 
-**Linux**: Gentoo, Alpine, CentOS, Ubuntu, Debian
-
 **DevOps**: MS Azure, Google Cloud Platform, DataBricks, Kubernetes
 
 **Soft Skills**: Communication, Project Management, Problem Solving, Leadership, Attention to Detail
