@@ -32,10 +32,10 @@ export const socials: SocialLink[] = [
 ];
 
 // Primary navigation, used by the header.
+// Projects is hidden for now — re-add { label: 'Projects', href: '/projects' } to bring it back.
 export const nav = [
   { label: 'About', href: '/about' },
   { label: 'Resume', href: '/resume' },
   { label: 'Photography', href: '/photography' },
-  { label: 'Projects', href: '/projects' },
   { label: 'Blog', href: '/blog' },
 ];
