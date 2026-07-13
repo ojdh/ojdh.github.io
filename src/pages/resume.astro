@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+import {
+  summary,
+  experience,
+  education,
+  skillGroups,
+} from '../data/resume';
+---
+
+<BaseLayout title="Resume" description={`${site.name} — resume`}>
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <h1 class="font-serif text-4xl font-semibold tracking-tight text-[var(--color-ink)]">
+        Résumé
+      </h1>
+      <!-- TODO: drop your real PDF at public/resume.pdf -->
+      <a
+        href="/resume.pdf"
+        download
+        class="rounded-full bg-[var(--color-ink)] px-5 py-2.5 text-sm font-medium text-[var(--color-canvas)] transition-opacity hover:opacity-90"
+      >
+        Download PDF
+      </a>
+    </div>
+
+    <p class="mt-6 max-w-2xl leading-relaxed text-[var(--color-muted)]">
+      {summary}
+    </p>
+
+    <!-- Experience -->
+    <h2 class="mt-12 font-serif text-2xl font-semibold text-[var(--color-ink)]">
+      Experience
+    </h2>
+    <div class="mt-6 space-y-8">
+      {
+        experience.map((job) => (
+          <div>
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-lg font-medium text-[var(--color-ink)]">
+                {job.role} ·{' '}
+                <span class="text-[var(--color-accent)]">{job.company}</span>
+              </h3>
+              <span class="text-sm text-[var(--color-muted)]">{job.period}</span>
+            </div>
+            {job.location && (
+              <p class="text-sm text-[var(--color-muted)]">{job.location}</p>
+            )}
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-[var(--color-ink)]">
+              {job.bullets.map((b) => (
+                <li class="leading-relaxed">{b}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Education -->
+    <h2 class="mt-12 font-serif text-2xl font-semibold text-[var(--color-ink)]">
+      Education
+    </h2>
+    <div class="mt-6 space-y-6">
+      {
+        education.map((ed) => (
+          <div>
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-lg font-medium text-[var(--color-ink)]">
+                {ed.degree}
+              </h3>
+              <span class="text-sm text-[var(--color-muted)]">{ed.period}</span>
+            </div>
+            <p class="text-[var(--color-accent)]">{ed.school}</p>
+            {ed.detail && (
+              <p class="mt-1 text-sm text-[var(--color-muted)]">{ed.detail}</p>
+            )}
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Skills -->
+    <h2 class="mt-12 font-serif text-2xl font-semibold text-[var(--color-ink)]">
+      Skills
+    </h2>
+    <div class="mt-6 grid gap-6 sm:grid-cols-3">
+      {
+        skillGroups.map((group) => (
+          <div>
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+              {group.title}
+            </h3>
+            <ul class="mt-2 flex flex-wrap gap-2">
+              {group.items.map((s) => (
+                <li class="rounded-full bg-[var(--color-accent-soft)] px-2.5 py-0.5 text-xs text-[var(--color-accent)]">
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

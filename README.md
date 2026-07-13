@@ -1,43 +1,45 @@
-# Chirpy Starter
+# ojdh.github.io
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+Personal portfolio, blog, and photography site for Ojaswi Dhoubhadel. Built with
+[Astro](https://astro.build) and deployed to GitHub Pages.
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
+## Stack
 
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
+- **Astro 5** — static site generation, near-zero client JS
+- **Tailwind CSS 4** — styling (`src/styles/global.css` holds the design tokens)
+- **Content collections** — typed Markdown for the blog and projects
+- **PhotoSwipe** — lightbox for the photography gallery
+- **astro:assets** — automatic image optimization
 
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
+## Develop
 
-```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # production build → dist/
+npm run preview  # preview the built site
 ```
 
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
+## Editing content
 
-## Usage
+| What | Where |
+|---|---|
+| Identity, tagline, social links | `src/data/site.ts` |
+| Résumé content | `src/data/resume.ts` (PDF: `public/resume.pdf`) |
+| About copy | `src/pages/about.astro` |
+| Blog posts | `src/content/blog/*.md` |
+| Projects | `src/content/projects/*.md` |
+| Photos | drop images into `src/assets/photos/` |
+| Colors / fonts | `src/styles/global.css` (`@theme` block) |
 
-Check out the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy/wiki).
+## Deploy
 
-## Contributing
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the site
+and publishes it to GitHub Pages.
 
-This repository is automatically updated with new releases from the theme repository. If you encounter any issues or want to contribute to its improvement, please visit the [theme repository][chirpy] to provide feedback.
+**One-time setup:** in the repo, go to **Settings → Pages → Build and deployment**
+and set **Source** to **GitHub Actions**.
 
 ## License
 
-This work is published under [MIT][mit] License.
-
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+[MIT](LICENSE).

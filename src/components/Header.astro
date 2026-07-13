@@ -1,0 +1,94 @@
+---
+import { site, nav } from '../data/site';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-[var(--color-faint)] bg-[var(--color-canvas)]/85 backdrop-blur-sm"
+>
+  <nav
+    class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4"
+    aria-label="Primary"
+  >
+    <a
+      href="/"
+      class="font-serif text-lg font-semibold tracking-tight text-[var(--color-ink)]"
+    >
+      {site.shortName}
+    </a>
+
+    <!-- Desktop nav -->
+    <ul class="hidden items-center gap-7 text-sm sm:flex">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[
+                'link-underline transition-colors hover:text-[var(--color-accent)]',
+                isActive(item.href)
+                  ? 'text-[var(--color-accent)]'
+                  : 'text-[var(--color-muted)]',
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Mobile toggle -->
+    <button
+      id="menu-toggle"
+      class="text-[var(--color-ink)] sm:hidden"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <ul
+    id="mobile-menu"
+    class="hidden flex-col gap-1 border-t border-[var(--color-faint)] px-6 py-3 sm:hidden"
+  >
+    {
+      nav.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            class:list={[
+              'block py-1.5 text-sm',
+              isActive(item.href)
+                ? 'text-[var(--color-accent)]'
+                : 'text-[var(--color-muted)]',
+            ]}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</header>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => {
+    const open = menu?.classList.toggle('hidden');
+    toggle.setAttribute('aria-expanded', String(open === false));
+  });
+</script>

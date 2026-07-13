@@ -2,25 +2,25 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Jekyll Server",
+      "label": "Dev server",
       "type": "shell",
-      "command": "./tools/run.sh",
+      "command": "npm run dev",
       "group": {
         "kind": "build",
         "isDefault": true
       },
       "problemMatcher": [],
-      "detail": "Runs the Jekyll server with live reload."
+      "detail": "Start the Astro dev server with hot reload."
     },
     {
-      "label": "Build Jekyll Site",
+      "label": "Build site",
       "type": "shell",
-      "command": "./tools/test.sh",
+      "command": "npm run build",
       "group": {
         "kind": "build"
       },
       "problemMatcher": [],
-      "detail": "Build the Jekyll site for production."
+      "detail": "Build the production site into dist/."
     }
   ]
 }
