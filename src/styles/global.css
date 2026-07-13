@@ -1,0 +1,123 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource/fraunces/400.css';
+@import '@fontsource/fraunces/500.css';
+@import '@fontsource/fraunces/600.css';
+
+/* ---------------------------------------------------------------------------
+   Design tokens. Minimal & clean: warm off-white canvas, near-black ink, a
+   single restrained accent. Tweak --accent to rebrand the whole site.
+--------------------------------------------------------------------------- */
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Fraunces', ui-serif, Georgia, serif;
+
+  --color-canvas: #fbfaf7;
+  --color-surface: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-muted: #6b6b6b;
+  --color-faint: #e8e5df;
+  --color-accent: #b5533a;
+  --color-accent-soft: #f3e7e2;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Typographic rhythm for long-form prose (blog posts, about, resume). */
+.prose-content {
+  line-height: 1.75;
+}
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+.prose-content h2 {
+  font-size: 1.6rem;
+}
+.prose-content h3 {
+  font-size: 1.25rem;
+}
+.prose-content p,
+.prose-content ul,
+.prose-content ol {
+  margin-bottom: 1.1rem;
+}
+.prose-content ul {
+  list-style: disc;
+  padding-left: 1.4rem;
+}
+.prose-content ol {
+  list-style: decimal;
+  padding-left: 1.4rem;
+}
+.prose-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: var(--color-faint);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.prose-content pre {
+  background: #1a1a1a;
+  color: #f5f5f5;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+.prose-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+.prose-content blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin-bottom: 1.1rem;
+}
+
+/* Reusable bits */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.25s ease;
+}
+.link-underline:hover::after {
+  width: 100%;
+}

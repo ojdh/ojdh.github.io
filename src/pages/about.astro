@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+import avatar from '../assets/oj.jpg';
+---
+
+<BaseLayout title="About" description={`About ${site.name}`}>
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <h1 class="font-serif text-4xl font-semibold tracking-tight text-[var(--color-ink)]">
+      About
+    </h1>
+
+    <div class="mt-8 flex flex-col gap-8 sm:flex-row">
+      <Image
+        src={avatar}
+        alt={`Portrait of ${site.name}`}
+        width={160}
+        height={160}
+        class="h-40 w-40 shrink-0 rounded-2xl object-cover"
+      />
+      <div class="prose-content text-[var(--color-ink)]">
+        <!-- TODO: replace this placeholder bio with your own story. -->
+        <p>
+          I'm {site.shortName}, a software and machine learning engineer based in
+          {site.location}. I enjoy taking ambiguous problems and turning them into
+          systems people can rely on.
+        </p>
+        <p>
+          This is placeholder copy. Tell your story here — where you've worked,
+          what you care about, and what you're exploring right now.
+        </p>
+        <p>
+          Outside of work I'm usually behind a camera. You can see a selection of
+          my photography <a href="/photography">here</a>.
+        </p>
+      </div>
+    </div>
+
+    <hr class="my-12 border-[var(--color-faint)]" />
+
+    <h2 class="font-serif text-2xl font-semibold text-[var(--color-ink)]">
+      A few things I care about
+    </h2>
+    <ul class="prose-content mt-4 text-[var(--color-ink)]">
+      <!-- TODO: personalize. -->
+      <li>Building things that are simple to use and hard to break.</li>
+      <li>Clear writing — code and prose alike.</li>
+      <li>Learning in public.</li>
+    </ul>
+  </section>
+</BaseLayout>

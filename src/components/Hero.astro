@@ -1,0 +1,51 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../data/site';
+import SocialLinks from './SocialLinks.astro';
+import avatar from '../assets/oj.jpg';
+---
+
+<section class="mx-auto max-w-5xl px-6 pb-16 pt-16 sm:pt-24">
+  <div class="flex flex-col-reverse items-start gap-10 sm:flex-row sm:items-center">
+    <div class="flex-1">
+      <p class="text-sm font-medium uppercase tracking-widest text-[var(--color-accent)]">
+        Hello, I'm
+      </p>
+      <h1
+        class="mt-3 font-serif text-4xl font-semibold leading-tight tracking-tight text-[var(--color-ink)] sm:text-5xl"
+      >
+        {site.name}
+      </h1>
+      <p class="mt-4 max-w-xl text-lg leading-relaxed text-[var(--color-muted)]">
+        {site.intro}
+      </p>
+
+      <div class="mt-7 flex flex-wrap items-center gap-4">
+        <a
+          href="/resume"
+          class="rounded-full bg-[var(--color-ink)] px-5 py-2.5 text-sm font-medium text-[var(--color-canvas)] transition-opacity hover:opacity-90"
+        >
+          View résumé
+        </a>
+        <a
+          href="/projects"
+          class="rounded-full border border-[var(--color-faint)] px-5 py-2.5 text-sm font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-ink)]"
+        >
+          See projects
+        </a>
+        <SocialLinks class="ml-1" />
+      </div>
+    </div>
+
+    <div class="shrink-0">
+      <Image
+        src={avatar}
+        alt={`Portrait of ${site.name}`}
+        width={176}
+        height={176}
+        class="h-36 w-36 rounded-2xl object-cover sm:h-44 sm:w-44"
+        loading="eager"
+      />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,60 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  tech: string[];
+  repo?: string;
+  demo?: string;
+}
+const { title, description, tech, repo, demo } = Astro.props;
+---
+
+<article
+  class="flex h-full flex-col rounded-xl border border-[var(--color-faint)] bg-[var(--color-surface)] p-6 transition-shadow hover:shadow-[0_6px_24px_rgba(0,0,0,0.06)]"
+>
+  <h3 class="font-serif text-xl font-semibold text-[var(--color-ink)]">
+    {title}
+  </h3>
+  <p class="mt-2 flex-1 text-sm leading-relaxed text-[var(--color-muted)]">
+    {description}
+  </p>
+
+  {
+    tech.length > 0 && (
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {tech.map((t) => (
+          <li class="rounded-full bg-[var(--color-accent-soft)] px-2.5 py-0.5 text-xs text-[var(--color-accent)]">
+            {t}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    (repo || demo) && (
+      <div class="mt-5 flex gap-4 text-sm font-medium">
+        {repo && (
+          <a
+            href={repo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underline text-[var(--color-ink)]"
+          >
+            Code →
+          </a>
+        )}
+        {demo && (
+          <a
+            href={demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underline text-[var(--color-ink)]"
+          >
+            Demo →
+          </a>
+        )}
+      </div>
+    )
+  }
+</article>

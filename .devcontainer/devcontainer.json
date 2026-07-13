@@ -1,28 +1,20 @@
 {
-  "name": "Jekyll",
-  "image": "mcr.microsoft.com/devcontainers/jekyll:2-bullseye",
+  "name": "Astro",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
   "onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [4321],
   "customizations": {
     "vscode": {
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh",
-        "workbench.colorTheme": "Monokai Dimmed"
+        "terminal.integrated.defaultProfile.linux": "zsh"
       },
       "extensions": [
-        // Liquid tags auto-complete
-        "killalau.vscode-liquid-snippets",
-        // Liquid syntax highlighting and formatting
-        "Shopify.theme-check-vscode",
-        // Shell
-        "timonwong.shellcheck",
-        "mkhl.shfmt",
-        // Common formatter
+        "astro-build.astro-vscode",
+        "bradlc.vscode-tailwindcss",
         "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
-        "stylelint.vscode-stylelint",
         "yzhang.markdown-all-in-one",
-        // Git
         "mhutchie.git-graph"
       ]
     }
