@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { intro, gearCategories } from '../data/gear';
+---
+
+<BaseLayout title="Gear" description="My camping gear list.">
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <h1 class="font-serif text-4xl font-semibold tracking-tight text-[var(--color-ink)]">
+      Camping Gear
+    </h1>
+    <p class="mt-4 max-w-xl leading-relaxed text-[var(--color-muted)]">
+      {intro}
+    </p>
+
+    <div class="mt-10 space-y-10">
+      {
+        gearCategories.map((category) => (
+          <div>
+            <h2 class="font-serif text-2xl font-semibold text-[var(--color-ink)]">
+              {category.title}
+            </h2>
+            <ul class="mt-4 divide-y divide-[var(--color-faint)]">
+              {category.items.map((item) => (
+                <li class="flex flex-wrap items-baseline justify-between gap-2 py-2.5">
+                  <span
+                    class:list={[
+                      item.skip
+                        ? 'text-[var(--color-muted)] line-through'
+                        : 'text-[var(--color-ink)]',
+                    ]}
+                  >
+                    {item.name}
+                    {item.notes && (
+                      <span class="text-sm text-[var(--color-muted)]"> — {item.notes}</span>
+                    )}
+                    {item.link && (
+                      <>
+                        {' '}
+                        <a href={item.link} class="link-underline text-sm text-[var(--color-accent)]">
+                          link
+                        </a>
+                      </>
+                    )}
+                  </span>
+                  {item.quantity && (
+                    <span class="text-sm text-[var(--color-muted)]">{item.quantity}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

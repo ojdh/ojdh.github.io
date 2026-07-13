@@ -1,5 +1,4 @@
 // Structured resume content. Edit these objects to update the /resume page.
-// All entries below are PLACEHOLDERS — replace with your real history.
 
 export type Experience = {
   role: string;
@@ -16,52 +15,114 @@ export type Education = {
   detail?: string;
 };
 
+export type Certification = {
+  name: string;
+  period: string;
+};
+
 export const summary =
-  // TODO: replace with your professional summary.
-  'Software and machine learning engineer with experience shipping data-driven products end to end — from model development to production deployment.';
+  'Senior Machine Learning Engineer with 4+ years delivering production NLP, LLM, and agentic AI systems in healthcare and insurance domains. Proven track record of building scalable ML pipelines, self-hosting open-source LLMs on multi-node GPU clusters, and driving measurable operational impact across cross-functional teams. Experienced across Azure, Databricks, and GCP environments with a strong foundation in distributed systems and end-to-end ML delivery.';
 
 export const experience: Experience[] = [
   {
-    role: 'Machine Learning Engineer', // TODO
-    company: 'AltaML', // TODO
-    period: '2023 — Present', // TODO
-    location: 'Edmonton, Canada',
+    role: 'Senior Machine Learning Developer',
+    company: 'AltaML',
+    period: 'Oct 2025 — Present',
+    location: 'Edmonton, AB',
     bullets: [
-      'Placeholder bullet — describe a key accomplishment with measurable impact.',
-      'Placeholder bullet — a technology or system you built and the outcome.',
+      "Architected agentic AI workflows on the company's proprietary platform using LangGraph and MCP (Model Context Protocol), enabling LLM agents to autonomously orchestrate multi-step tasks across external APIs and services — reducing manual intervention in complex workflows.",
+      'Owned backend integration for a client-facing community platform, designing OAuth2/JWT authentication flows, token lifecycle management, and user attribution across distributed service layers to meet enterprise security requirements.',
+      'Applied distributed systems patterns — including Postgres-backed task queues, server-sent events, and idempotent write-back with human-in-the-loop checkpoints — to harden ML pipelines for production reliability.',
     ],
   },
   {
-    role: 'Previous Role', // TODO
-    company: 'Previous Company', // TODO
-    period: '2021 — 2023', // TODO
+    role: 'Machine Learning Developer II',
+    company: 'AltaML',
+    period: 'May 2024 — Sept 2025',
+    location: 'Edmonton, AB',
     bullets: [
-      'Placeholder bullet — what you owned and delivered.',
-      'Placeholder bullet — collaboration or leadership highlight.',
+      'Delivered end-to-end NLP systems generating $1M+ in annual operational savings per deployment across healthcare and insurance clients.',
+      'Built scalable PySpark pipelines processing PDFs, images, and speech-to-text outputs, serving as the data foundation for downstream ML systems.',
+      'Drove a 20% improvement in model accuracy through systematic feature engineering, dataset curation, and iterative experimentation.',
+      'Led and mentored a 3-person team to deliver LLM-powered medical summarization systems into production, owning technical direction and stakeholder communication.',
+    ],
+  },
+  {
+    role: 'Machine Learning Developer',
+    company: 'AltaML',
+    period: 'May 2022 — Apr 2024',
+    location: 'Edmonton, AB',
+    bullets: [
+      'Fine-tuned custom LLMs for configuration code generation and industrial narrative automation, reducing manual authoring time for domain-specific content.',
+      'Developed ML and deep learning models for time-series forecasting and LiDAR point cloud classification across industrial and infrastructure clients.',
+      'Delivered production solutions across Azure and GCP — adapting to client-mandated cloud environments while maintaining consistent delivery quality.',
+    ],
+  },
+  {
+    role: 'Client Solutions Engineer, EIT',
+    company: 'Lifting Solutions Inc',
+    period: 'Feb 2020 — Apr 2022',
+    location: 'Edmonton, AB',
+    bullets: [
+      'Led preparation of technical and commercial proposals for international tenders for Oil and Gas equipment (Progressive Cavity Pumps and Endless Rods) across Oman, India, Australia, and Canada.',
+      'Executed CAD $4M+ in orders within 2 years, standardizing project order execution processes across product lines.',
+      'Collaborated with operations, marketing, supply chain, and executive stakeholders to solve business challenges during international expansion.',
     ],
   },
 ];
 
 export const education: Education[] = [
   {
-    degree: 'B.Sc. in Computer Science', // TODO
-    school: 'University Name', // TODO
-    period: '2017 — 2021', // TODO
-    detail: 'Optional: honours, focus area, or notable coursework.',
+    degree: 'B.Sc., Mechanical Engineering Co-Op',
+    school: 'University of Alberta, Edmonton, AB',
+    period: 'Sept 2013 — Apr 2018',
+    detail: 'GPA: 3.86/4.0',
+  },
+];
+
+export const certifications: Certification[] = [
+  { name: 'Microsoft Azure Data Scientist Associate', period: '2023 — Active' },
+  { name: 'Google Cloud Professional Machine Learning Engineer', period: '2023 — Active' },
+];
+
+export const volunteer: Experience[] = [
+  {
+    role: 'Director',
+    company: 'Edmonton Data Society',
+    period: '2024 — Present',
+    bullets: [
+      "Led strategic planning and event programming for Edmonton's data science and ML practitioner community, fostering professional development and knowledge sharing across the local tech ecosystem.",
+    ],
   },
 ];
 
 export const skillGroups: { title: string; items: string[] }[] = [
   {
     title: 'Languages',
-    items: ['Python', 'TypeScript', 'SQL', 'Bash'], // TODO
+    items: ['Python', 'PySpark', 'SQL'],
   },
   {
-    title: 'ML & Data',
-    items: ['PyTorch', 'scikit-learn', 'pandas', 'MLflow'], // TODO
+    title: 'LLM Ecosystem',
+    items: [
+      'Llama',
+      'Mistral',
+      'OpenAI API',
+      'Anthropic API',
+      'LangGraph',
+      'MCP',
+      'LangSmith',
+    ],
   },
   {
-    title: 'Platform',
-    items: ['Docker', 'GitHub Actions', 'Azure', 'PostgreSQL'], // TODO
+    title: 'ML & LLM Frameworks',
+    items: ['Hugging Face Transformers', 'PyTorch', 'TensorFlow'],
+  },
+  {
+    title: 'Architectures',
+    items: ['RAG', 'Hybrid Search', 'Agentic Workflows', 'Fine-Tuning'],
+  },
+  {
+    title: 'Infrastructure & MLOps',
+    items: ['Databricks', 'MLflow', 'Docker', 'Azure', 'GCP'],
   },
 ];

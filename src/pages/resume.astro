@@ -5,6 +5,8 @@ import {
   summary,
   experience,
   education,
+  certifications,
+  volunteer,
   skillGroups,
 } from '../data/resume';
 ---
@@ -15,7 +17,6 @@ import {
       <h1 class="font-serif text-4xl font-semibold tracking-tight text-[var(--color-ink)]">
         Résumé
       </h1>
-      <!-- TODO: drop your real PDF at public/resume.pdf -->
       <a
         href="/resume.pdf"
         download
@@ -80,11 +81,51 @@ import {
       }
     </div>
 
+    <!-- Certifications -->
+    <h2 class="mt-12 font-serif text-2xl font-semibold text-[var(--color-ink)]">
+      Certifications
+    </h2>
+    <div class="mt-6 space-y-2">
+      {
+        certifications.map((cert) => (
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="text-[var(--color-ink)]">{cert.name}</h3>
+            <span class="text-sm text-[var(--color-muted)]">{cert.period}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Volunteer & Leadership -->
+    <h2 class="mt-12 font-serif text-2xl font-semibold text-[var(--color-ink)]">
+      Volunteer & Leadership
+    </h2>
+    <div class="mt-6 space-y-8">
+      {
+        volunteer.map((role) => (
+          <div>
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-lg font-medium text-[var(--color-ink)]">
+                {role.role} ·{' '}
+                <span class="text-[var(--color-accent)]">{role.company}</span>
+              </h3>
+              <span class="text-sm text-[var(--color-muted)]">{role.period}</span>
+            </div>
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-[var(--color-ink)]">
+              {role.bullets.map((b) => (
+                <li class="leading-relaxed">{b}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
     <!-- Skills -->
     <h2 class="mt-12 font-serif text-2xl font-semibold text-[var(--color-ink)]">
       Skills
     </h2>
-    <div class="mt-6 grid gap-6 sm:grid-cols-3">
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
         skillGroups.map((group) => (
           <div>
