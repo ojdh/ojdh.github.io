@@ -1,10 +1,12 @@
 // Structured camping gear list. Edit these objects to update the /gear page.
-// All entries below are PLACEHOLDERS — replace with your real gear list.
 
 export type GearItem = {
   name: string;
-  weight?: string;
+  quantity?: string;
   notes?: string;
+  link?: string;
+  /** Struck through in the source list — kept for reference but not currently packed. */
+  skip?: boolean;
 };
 
 export type GearCategory = {
@@ -12,39 +14,106 @@ export type GearCategory = {
   items: GearItem[];
 };
 
-export const intro =
-  // TODO: replace with your own intro.
-  "The gear I bring camping. Not exhaustive, but it's what ends up in the pack most trips.";
+export const intro = 'What goes in the truck before a camping trip — organized by category.';
 
 export const gearCategories: GearCategory[] = [
   {
-    title: 'Shelter & Sleep',
+    title: 'Shelter, Sleep & Sitting',
     items: [
-      { name: 'Placeholder tent', weight: '2.5 lb', notes: 'TODO: brand/model' },
-      { name: 'Placeholder sleeping bag', weight: '1.8 lb', notes: 'TODO: temp rating' },
-      { name: 'Placeholder sleeping pad', notes: 'TODO' },
+      { name: 'Tent — 8 person', notes: 'broken as of June 2026' },
+      { name: 'Tent — 2 person' },
+      { name: 'Sleeping cot', quantity: 'x 2' },
+      { name: 'Sleeping air mattress', quantity: 'x 2', notes: 'Queen size' },
+      { name: 'Sleeping mattress', quantity: 'x 1', notes: 'Single' },
+      { name: 'Tarp', quantity: 'x 1' },
+      { name: 'Hammock', quantity: 'x 1' },
+      { name: 'Camping chairs', quantity: 'x 3' },
     ],
   },
   {
-    title: 'Cooking & Water',
+    title: 'Cooking & Food',
     items: [
-      { name: 'Placeholder stove', notes: 'TODO' },
-      { name: 'Placeholder water filter', notes: 'TODO' },
-      { name: 'Placeholder cookware', notes: 'TODO' },
+      {
+        name: 'Camp stove — single burner',
+        notes: 'Takes 8 oz cans of propane/butane (to confirm)',
+      },
+      {
+        name: 'Jet Boil knock-off (two pots)',
+        notes: 'Takes 8 oz propane/isobutane',
+        link: 'https://www.canadiantire.ca/en/pdp/woods-butane-propane-gas-cylinder-canister-fuel-for-camping-stoves-lanterns-heaters-8-oz-0762010p.html',
+      },
+      { name: 'Cooler', quantity: 'x 1', notes: '48 qt (tbc)' },
+      { name: 'Dish soap and sponge' },
+      { name: 'Lighter and waterproof matches' },
+      { name: 'Pot and pan', notes: '2 cast iron (from kitchen)' },
+      { name: 'Utensils' },
+      { name: 'Plates, bowls, mugs' },
+      { name: 'Sharp knife and cutting board', notes: '1 large plastic' },
+      { name: 'Trash bags' },
+      { name: 'Food storage (bear canister if needed)', skip: true },
+      { name: 'Water bottles' },
+      { name: 'Water filter or purification tablets' },
+    ],
+  },
+  {
+    title: 'Lighting & Navigation',
+    items: [
+      {
+        name: 'Headlamp',
+        quantity: 'x 3',
+        notes: 'one battery operated, one USB-C, one USB-A',
+      },
+      { name: 'Lantern', quantity: 'x 2' },
+      {
+        name: 'Portable charger 20000 mAh',
+        quantity: 'x 1',
+        notes: 'does not include USB-C',
+      },
+    ],
+  },
+  {
+    title: 'Tools & Safety',
+    items: [
+      { name: 'Bear spray', quantity: 'x 2', notes: 'one is likely expired' },
+      { name: 'Axe or hatchet', quantity: 'x 2', notes: 'full size + mid size' },
+      { name: 'Duct tape', notes: 'in Elantra' },
+      { name: 'Paracord', notes: 'in Elantra' },
+      { name: 'First-aid kit', notes: 'in Elantra' },
+      { name: 'Multi-tool or pocket knife', skip: true },
+      { name: 'Insect repellent' },
+      { name: 'Sunscreen' },
+      { name: 'Fire starter' },
     ],
   },
   {
     title: 'Clothing',
     items: [
-      { name: 'Placeholder rain shell', notes: 'TODO' },
-      { name: 'Placeholder insulating layer', notes: 'TODO' },
+      { name: 'Moisture-wicking base layers' },
+      { name: 'Insulating mid-layer', notes: 'fleece or puffy' },
+      { name: 'Waterproof rain jacket and pants' },
+      { name: 'Hiking pants and shorts' },
+      { name: 'T-shirts' },
+      { name: 'Warm hat and sun hat' },
+      { name: 'Gloves' },
+      { name: 'Wool socks', notes: 'extra pairs' },
+      { name: 'Sturdy hiking boots' },
+      { name: 'Camp shoes or sandals' },
     ],
   },
   {
-    title: 'Miscellaneous',
+    title: 'Hygiene',
     items: [
-      { name: 'Placeholder headlamp', notes: 'TODO' },
-      { name: 'Placeholder first aid kit', notes: 'TODO' },
+      { name: 'Toilet paper' },
+      { name: 'Trowel' },
+      { name: 'Hand sanitizer' },
+      { name: 'Biodegradable soap' },
+      { name: 'Towel' },
+      { name: 'Toothbrush and toothpaste' },
+      { name: 'Wet wipes' },
     ],
+  },
+  {
+    title: 'Extras',
+    items: [{ name: 'Playing cards or books' }],
   },
 ];
