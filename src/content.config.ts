@@ -26,4 +26,25 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { blog, projects };
+const gear = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/gear' }),
+  schema: z.object({
+    intro: z.string(),
+    categories: z.array(
+      z.object({
+        title: z.string(),
+        items: z.array(
+          z.object({
+            name: z.string(),
+            quantity: z.string().optional(),
+            notes: z.string().optional(),
+            link: z.string().url().optional(),
+            skip: z.boolean().default(false),
+          })
+        ),
+      })
+    ),
+  }),
+});
+
+export const collections = { blog, projects, gear };
