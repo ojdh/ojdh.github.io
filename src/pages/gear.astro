@@ -1,6 +1,10 @@
 ---
+import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { intro, gearCategories } from '../data/gear';
+
+const gear = await getEntry('gear', 'camping');
+if (!gear) throw new Error('Missing gear/camping.md content entry');
+const { intro, categories: gearCategories } = gear.data;
 ---
 
 <BaseLayout title="Gear" description="My camping gear list.">
