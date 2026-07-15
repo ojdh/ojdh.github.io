@@ -8,7 +8,7 @@ export const site = {
   tagline: 'Software & ML engineer, occasional photographer.',
   // TODO: 1-2 sentence intro shown in the hero.
   intro:
-    'I build software and machine learning systems. Off the clock, I make photographs and write about what I learn.',
+    'I build software and machine learning systems. Off the clock, I make photographs and play soccer.',
   email: 'ojaswi.365@gmail.com',
   url: 'https://ojdh.github.io',
   location: 'Edmonton, Canada',
