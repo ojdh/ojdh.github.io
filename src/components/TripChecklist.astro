@@ -32,6 +32,7 @@
     <div class="camp-tabs">
       <button data-view="checklist" class="camp-tab" data-active="true">📋 Checklist</button>
       <button data-view="summary" class="camp-tab" data-active="false">🎒 Who's Bringing What</button>
+      <button data-view="swipe" class="camp-tab" data-active="false">🃏 Swipe</button>
     </div>
     <div class="camp-identity">
       <span id="identity-display"></span>
@@ -53,6 +54,33 @@
   </div>
 
   <div id="view-summary" class="mt-8 hidden space-y-6"></div>
+
+  <div id="view-swipe" class="mt-8 hidden space-y-6">
+    <div class="camp-swipe-toolbar">
+      <span id="swipe-progress" class="camp-swipe-progress"></span>
+      <button id="swipe-add-btn" type="button" class="camp-btn camp-btn--sm">✨ Add something new</button>
+    </div>
+    <form id="swipe-add-form" class="camp-swipe-add-form hidden">
+      <input id="swipe-add-input" placeholder="What did we forget?" class="camp-input camp-input--sm" />
+      <button type="submit" class="camp-btn camp-btn--mustard camp-btn--sm">Add it</button>
+    </form>
+    <div id="swipe-stack" class="camp-swipe-stack"></div>
+    <div id="swipe-actions" class="camp-swipe-actions">
+      <button id="swipe-nope-btn" type="button" class="camp-swipe-action camp-swipe-action--nope">
+        👎 Nope
+      </button>
+      <button id="swipe-yes-btn" type="button" class="camp-swipe-action camp-swipe-action--yes">
+        🙋 I'll bring this!
+      </button>
+    </div>
+    <div id="swipe-end" class="camp-swipe-end hidden">
+      <p class="camp-swipe-end__title">🎉 That's the whole deck!</p>
+      <p class="camp-swipe-end__subtitle">Want to play again?</p>
+      <button id="swipe-restart-btn" type="button" class="camp-btn camp-btn--mustard">
+        🔄 Shuffle &amp; restart
+      </button>
+    </div>
+  </div>
 </div>
 
 <style is:global>
@@ -536,6 +564,218 @@
     color: var(--camp-rust-deep);
     background: color-mix(in srgb, var(--camp-rust) 15%, transparent);
   }
+
+  .camp-swipe-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .camp-swipe-progress {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--camp-forest-deep);
+    opacity: 0.75;
+  }
+  .camp-swipe-add-form {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .camp-swipe-add-form.hidden {
+    display: none;
+  }
+  .camp-swipe-add-form input {
+    width: 14rem;
+    max-width: 60vw;
+  }
+
+  .camp-swipe-stack {
+    position: relative;
+    height: 22rem;
+    max-width: 24rem;
+    margin: 0 auto;
+    touch-action: pan-y;
+  }
+  .camp-swipe-card {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--camp-card);
+    border: 3px solid var(--camp-forest);
+    border-radius: 1.25rem;
+    box-shadow: 6px 6px 0 var(--camp-forest);
+    padding: 1.5rem 1.25rem;
+    cursor: grab;
+    user-select: none;
+    will-change: transform;
+  }
+  .camp-swipe-card:active {
+    cursor: grabbing;
+  }
+  .camp-swipe-card--peek {
+    transform: scale(0.94) translateY(0.6rem);
+    box-shadow: 4px 4px 0 var(--camp-forest);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .camp-swipe-card__art {
+    width: 6.5rem;
+    height: 6.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--camp-cream);
+    border: 2px dashed var(--camp-forest);
+    border-radius: 1rem;
+    margin-top: 0.5rem;
+  }
+  .camp-swipe-card__icon {
+    width: 5rem;
+    height: 5rem;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .camp-swipe-card__group {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--camp-mustard-deep);
+    text-align: center;
+  }
+  .camp-swipe-card__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--camp-forest);
+    text-align: center;
+    transform: rotate(-0.5deg);
+  }
+  .camp-swipe-card__claimants {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 1.6rem;
+  }
+  .camp-swipe-card__claimants-label {
+    font-size: 0.75rem;
+    color: var(--camp-forest-deep);
+    opacity: 0.6;
+    text-align: center;
+  }
+  .camp-swipe-card__stamp {
+    position: absolute;
+    top: 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.3rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 3px solid currentColor;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .camp-swipe-card__stamp--yes {
+    left: 1.25rem;
+    color: var(--camp-forest);
+    transform: rotate(-18deg);
+  }
+  .camp-swipe-card__stamp--nope {
+    right: 1.25rem;
+    color: var(--camp-rust-deep);
+    transform: rotate(18deg);
+  }
+
+  .camp-swipe-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .camp-swipe-actions.hidden {
+    display: none;
+  }
+  .camp-swipe-action {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 9999px;
+    padding: 0.75rem 1.5rem;
+    border: 2.5px solid var(--camp-forest);
+    background: var(--camp-card);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  .camp-swipe-action:hover {
+    transform: translateY(-2px);
+  }
+  .camp-swipe-action--nope {
+    color: var(--camp-rust-deep);
+    box-shadow: 3px 3px 0 var(--camp-rust);
+  }
+  .camp-swipe-action--yes {
+    color: var(--camp-forest-deep);
+    background: var(--camp-mustard);
+    box-shadow: 3px 3px 0 var(--camp-forest);
+  }
+
+  .camp-swipe-end {
+    max-width: 24rem;
+    margin: 0 auto;
+    text-align: center;
+    background: var(--camp-card);
+    border: 3px dashed var(--camp-forest);
+    border-radius: 1.25rem;
+    padding: 2rem 1.5rem;
+  }
+  .camp-swipe-end.hidden {
+    display: none;
+  }
+  .camp-swipe-end__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--camp-forest);
+  }
+  .camp-swipe-end__subtitle {
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    color: var(--camp-forest-deep);
+    opacity: 0.75;
+  }
+
+  .camp-swipe-toast {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--camp-mustard);
+    border: 3px solid var(--camp-forest);
+    border-radius: 1.25rem;
+    box-shadow: 6px 6px 0 var(--camp-forest);
+    z-index: 5;
+    animation: camp-chip-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .camp-swipe-toast img {
+    width: 5rem;
+    height: 5rem;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .camp-swipe-toast p {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--camp-forest-deep);
+    text-align: center;
+    padding: 0 1rem;
+  }
 </style>
 
 <script>
@@ -607,6 +847,118 @@
   ];
   const FALLBACK_AVATAR_ICONS = ['🎒', '🥾', '🧭', '🔥', '🌲', '⭐'];
 
+  // Pixel-art matching for Swipe mode: keyword -> icon key, checked in order
+  // (most specific first) against the item's name, then category, then
+  // group_name. Flavor, not precision — falls back to a generic icon.
+  const ITEM_ICON_PATHS: Record<string, string> = {
+    tent: '/pixel-camp/items/tent.png',
+    'sleeping-bag': '/pixel-camp/items/sleeping-bag.png',
+    backpack: '/pixel-camp/items/backpack.png',
+    lantern: '/pixel-camp/items/lantern.png',
+    cooler: '/pixel-camp/items/cooler.png',
+    chair: '/pixel-camp/items/chair.png',
+    pot: '/pixel-camp/items/pot.png',
+    cutlery: '/pixel-camp/items/cutlery.png',
+    plate: '/pixel-camp/items/plate.png',
+    drink: '/pixel-camp/items/drink.png',
+    hatchet: '/pixel-camp/items/hatchet.png',
+    toiletries: '/pixel-camp/items/toiletries.png',
+    rain: '/pixel-camp/items/rain.png',
+    cards: '/pixel-camp/items/cards.png',
+    speaker: '/pixel-camp/items/speaker.png',
+    boots: '/pixel-camp/items/boots.png',
+    logs: '/pixel-camp/items/logs.png',
+    campfire: '/pixel-camp/campfire.png',
+    generic: '/pixel-camp/items/generic.png',
+    dog: '/pixel-camp/items/dog.png',
+  };
+  const ITEM_ICON_KEYWORDS: [string, string][] = [
+    ['firewood', 'logs'],
+    ['kindling', 'logs'],
+    ['campfire', 'campfire'],
+    ['fire', 'campfire'],
+    ['tent', 'tent'],
+    ['sleeping', 'sleeping-bag'],
+    ['pad', 'sleeping-bag'],
+    ['backpack', 'backpack'],
+    ['daypack', 'backpack'],
+    ['pack', 'backpack'],
+    ['headlamp', 'lantern'],
+    ['flashlight', 'lantern'],
+    ['lantern', 'lantern'],
+    ['light', 'lantern'],
+    ['cooler', 'cooler'],
+    ['ice', 'cooler'],
+    ['chair', 'chair'],
+    ['stool', 'chair'],
+    ['stove', 'pot'],
+    ['skillet', 'pot'],
+    ['pan', 'pot'],
+    ['pot', 'pot'],
+    ['fork', 'cutlery'],
+    ['spoon', 'cutlery'],
+    ['knife', 'cutlery'],
+    ['cutlery', 'cutlery'],
+    ['utensil', 'cutlery'],
+    ['plate', 'plate'],
+    ['bowl', 'plate'],
+    ['cup', 'drink'],
+    ['mug', 'drink'],
+    ['drink', 'drink'],
+    ['beer', 'drink'],
+    ['wine', 'drink'],
+    ['water', 'drink'],
+    ['coffee', 'drink'],
+    ['soda', 'drink'],
+    ['juice', 'drink'],
+    ['hatchet', 'hatchet'],
+    ['axe', 'hatchet'],
+    ['saw', 'hatchet'],
+    ['tool', 'hatchet'],
+    ['spray', 'toiletries'],
+    ['bug', 'toiletries'],
+    ['sunscreen', 'toiletries'],
+    ['soap', 'toiletries'],
+    ['toothbrush', 'toiletries'],
+    ['toothpaste', 'toiletries'],
+    ['towel', 'toiletries'],
+    ['deodorant', 'toiletries'],
+    ['poncho', 'rain'],
+    ['umbrella', 'rain'],
+    ['tarp', 'rain'],
+    ['rain', 'rain'],
+    ['card', 'cards'],
+    ['game', 'cards'],
+    ['frisbee', 'cards'],
+    ['ball', 'cards'],
+    ['speaker', 'speaker'],
+    ['music', 'speaker'],
+    ['battery', 'speaker'],
+    ['batteries', 'speaker'],
+    ['charger', 'speaker'],
+    ['boot', 'boots'],
+    ['shoe', 'boots'],
+    ['hiking', 'boots'],
+    ['sock', 'boots'],
+    ['protein', 'plate'],
+    ['mains', 'plate'],
+    ['meat', 'plate'],
+    ['egg', 'plate'],
+    ['snack', 'plate'],
+    ['produce', 'plate'],
+    ['veg', 'plate'],
+    ['fruit', 'plate'],
+    ['food', 'plate'],
+  ];
+
+  function pickItemIconPath(item: Item): string {
+    const haystacks = [item.name, item.category, item.group_name].map((s) => s.toLowerCase());
+    for (const [keyword, key] of ITEM_ICON_KEYWORDS) {
+      if (haystacks.some((h) => h.includes(keyword))) return ITEM_ICON_PATHS[key];
+    }
+    return ITEM_ICON_PATHS.generic;
+  }
+
   let client: ReturnType<typeof createTripClient> | null = null;
   let items: Item[] = [];
   let assignments: Assignment[] = [];
@@ -614,6 +966,13 @@
   const collapsedGroups = new Set<string>();
   const selectedItemIds = new Set<string>();
   let activeFilter: string | null = null;
+  let activeView: 'checklist' | 'summary' | 'swipe' = 'checklist';
+
+  // --- Swipe mode state ---
+  let swipeDeck: Item[] = [];
+  let swipeIndex = 0;
+  let swipeInitialized = false;
+  let swipeBusy = false;
 
   let myName = localStorage.getItem(NAME_STORAGE_KEY) ?? '';
   let myAvatar = localStorage.getItem(AVATAR_STORAGE_KEY) ?? '';
@@ -651,6 +1010,17 @@
   const groupsEl = document.getElementById('groups')!;
   const viewChecklist = document.getElementById('view-checklist')!;
   const viewSummary = document.getElementById('view-summary')!;
+  const viewSwipe = document.getElementById('view-swipe')!;
+  const swipeProgress = document.getElementById('swipe-progress')!;
+  const swipeAddBtn = document.getElementById('swipe-add-btn') as HTMLButtonElement;
+  const swipeAddForm = document.getElementById('swipe-add-form') as HTMLFormElement;
+  const swipeAddInput = document.getElementById('swipe-add-input') as HTMLInputElement;
+  const swipeStack = document.getElementById('swipe-stack')!;
+  const swipeActions = document.getElementById('swipe-actions')!;
+  const swipeNopeBtn = document.getElementById('swipe-nope-btn') as HTMLButtonElement;
+  const swipeYesBtn = document.getElementById('swipe-yes-btn') as HTMLButtonElement;
+  const swipeEnd = document.getElementById('swipe-end')!;
+  const swipeRestartBtn = document.getElementById('swipe-restart-btn') as HTMLButtonElement;
 
   // --- Name / avatar onboarding ---
 
@@ -816,9 +1186,15 @@
     btn.addEventListener('click', () => {
       document.querySelectorAll<HTMLButtonElement>('.camp-tab').forEach((b) => (b.dataset.active = 'false'));
       btn.dataset.active = 'true';
-      const view = btn.dataset.view;
+      const view = (btn.dataset.view ?? 'checklist') as 'checklist' | 'summary' | 'swipe';
+      activeView = view;
       viewChecklist.classList.toggle('hidden', view !== 'checklist');
       viewSummary.classList.toggle('hidden', view !== 'summary');
+      viewSwipe.classList.toggle('hidden', view !== 'swipe');
+      if (view === 'swipe') {
+        if (!swipeInitialized) startSwipeDeck();
+        else renderSwipeMode();
+      }
     });
   });
 
@@ -917,6 +1293,7 @@
   function render() {
     renderChecklist();
     renderSummary();
+    if (activeView === 'swipe') renderSwipeMode();
   }
 
   function escapeHtml(s: string) {
@@ -1179,6 +1556,259 @@
         viewSummary.appendChild(section);
       });
   }
+
+  // --- Swipe mode ---
+  //
+  // Deck is built once per session (on first opening the tab, or on
+  // restart) from *all* items regardless of the checklist's group filter —
+  // Swipe mode is meant to blast through the whole list quickly. Skipping
+  // an item only advances the local session's swipe order; it never
+  // touches the database, so it's safe to restart as many times as you like.
+
+  function shuffle<T>(arr: T[]): T[] {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function startSwipeDeck() {
+    swipeDeck = shuffle(items);
+    swipeIndex = 0;
+    swipeInitialized = true;
+    swipeBusy = false;
+    renderSwipeMode();
+  }
+
+  swipeRestartBtn.addEventListener('click', () => startSwipeDeck());
+
+  function updateSwipeProgress() {
+    const total = swipeDeck.length;
+    swipeProgress.textContent = total > 0 ? `${Math.min(swipeIndex, total)} / ${total}` : '';
+  }
+
+  function buildSwipeCard(item: Item, peek: boolean): HTMLElement {
+    const card = document.createElement('div');
+    card.className = peek ? 'camp-swipe-card camp-swipe-card--peek' : 'camp-swipe-card';
+    card.dataset.itemId = item.id;
+
+    const art = document.createElement('div');
+    art.className = 'camp-swipe-card__art';
+    const icon = document.createElement('img');
+    icon.src = pickItemIconPath(item);
+    icon.alt = '';
+    icon.className = 'camp-swipe-card__icon';
+    art.appendChild(icon);
+    card.appendChild(art);
+
+    const groupLine = document.createElement('div');
+    groupLine.className = 'camp-swipe-card__group';
+    groupLine.textContent =
+      item.category !== item.group_name ? `${item.group_name} · ${item.category}` : item.group_name;
+    card.appendChild(groupLine);
+
+    const name = document.createElement('div');
+    name.className = 'camp-swipe-card__name';
+    name.textContent = item.name;
+    card.appendChild(name);
+
+    const claimants = document.createElement('div');
+    claimants.className = 'camp-swipe-card__claimants';
+    const itemAssignments = assignments.filter((a) => a.item_id === item.id);
+    if (itemAssignments.length === 0) {
+      const label = document.createElement('span');
+      label.className = 'camp-swipe-card__claimants-label';
+      label.textContent = 'Nobody has this yet';
+      claimants.appendChild(label);
+    } else {
+      for (const a of itemAssignments) {
+        const chip = document.createElement('span');
+        chip.className = 'camp-chip';
+        if (a.avatar) appendAvatar(chip, a.avatar, 'camp-chip-avatar');
+        chip.appendChild(document.createTextNode(a.person_name));
+        claimants.appendChild(chip);
+      }
+    }
+    card.appendChild(claimants);
+
+    const stampYes = document.createElement('div');
+    stampYes.className = 'camp-swipe-card__stamp camp-swipe-card__stamp--yes';
+    stampYes.textContent = "I'LL BRING IT";
+    card.appendChild(stampYes);
+
+    const stampNope = document.createElement('div');
+    stampNope.className = 'camp-swipe-card__stamp camp-swipe-card__stamp--nope';
+    stampNope.textContent = 'NOPE';
+    card.appendChild(stampNope);
+
+    if (!peek) attachDragHandlers(card, item, stampYes, stampNope);
+
+    return card;
+  }
+
+  function attachDragHandlers(
+    card: HTMLElement,
+    item: Item,
+    stampYes: HTMLElement,
+    stampNope: HTMLElement
+  ) {
+    const threshold = 90;
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let dy = 0;
+
+    function setStamps(currentDx: number) {
+      stampYes.style.opacity = currentDx > 0 ? String(Math.min(currentDx / threshold, 1)) : '0';
+      stampNope.style.opacity = currentDx < 0 ? String(Math.min(-currentDx / threshold, 1)) : '0';
+    }
+
+    card.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (swipeBusy) return;
+      dragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      card.setPointerCapture(e.pointerId);
+      card.style.transition = 'none';
+    });
+
+    card.addEventListener('pointermove', (e: PointerEvent) => {
+      if (!dragging) return;
+      dx = e.clientX - startX;
+      dy = e.clientY - startY;
+      card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 18}deg)`;
+      setStamps(dx);
+    });
+
+    function onRelease() {
+      if (!dragging) return;
+      dragging = false;
+      card.style.transition = 'transform 250ms ease, opacity 250ms ease';
+      if (dx > threshold) {
+        commitSwipe(card, item, 'right');
+      } else if (dx < -threshold) {
+        commitSwipe(card, item, 'left');
+      } else {
+        card.style.transform = 'translate(0, 0) rotate(0deg)';
+        setStamps(0);
+      }
+      dx = 0;
+      dy = 0;
+    }
+
+    card.addEventListener('pointerup', onRelease);
+    card.addEventListener('pointercancel', onRelease);
+  }
+
+  function commitSwipe(card: HTMLElement, item: Item, direction: 'left' | 'right') {
+    if (swipeBusy) return;
+    swipeBusy = true;
+    swipeNopeBtn.disabled = true;
+    swipeYesBtn.disabled = true;
+    const flyX = direction === 'right' ? 700 : -700;
+    card.style.transition = 'transform 300ms ease, opacity 300ms ease';
+    card.style.transform = `translate(${flyX}px, -30px) rotate(${direction === 'right' ? 22 : -22}deg)`;
+    card.style.opacity = '0';
+    card.style.pointerEvents = 'none';
+    setTimeout(async () => {
+      swipeIndex += 1;
+      swipeBusy = false;
+      swipeNopeBtn.disabled = false;
+      swipeYesBtn.disabled = false;
+      if (direction === 'right') {
+        await claimItem(item.id, ''); // claimItem() re-renders via refreshAssignments()
+      } else {
+        renderSwipeMode();
+      }
+    }, 300);
+  }
+
+  swipeNopeBtn.addEventListener('click', () => {
+    if (swipeBusy) return;
+    const card = swipeStack.querySelector<HTMLElement>('.camp-swipe-card:not(.camp-swipe-card--peek)');
+    const item = swipeDeck[swipeIndex];
+    if (!card || !item) return;
+    card.style.transition = 'transform 250ms ease, opacity 250ms ease';
+    commitSwipe(card, item, 'left');
+  });
+
+  swipeYesBtn.addEventListener('click', () => {
+    if (swipeBusy) return;
+    const card = swipeStack.querySelector<HTMLElement>('.camp-swipe-card:not(.camp-swipe-card--peek)');
+    const item = swipeDeck[swipeIndex];
+    if (!card || !item) return;
+    card.style.transition = 'transform 250ms ease, opacity 250ms ease';
+    commitSwipe(card, item, 'right');
+  });
+
+  function renderSwipeMode() {
+    if (!swipeInitialized) return;
+
+    // Skip past any item that got deleted elsewhere mid-session.
+    while (swipeIndex < swipeDeck.length && !items.find((i) => i.id === swipeDeck[swipeIndex].id)) {
+      swipeIndex += 1;
+    }
+
+    updateSwipeProgress();
+    swipeStack.innerHTML = '';
+
+    if (swipeDeck.length === 0) {
+      swipeActions.classList.add('hidden');
+      swipeEnd.classList.remove('hidden');
+      swipeEnd.querySelector('.camp-swipe-end__title')!.textContent = '🏕️ Nothing to swipe yet!';
+      swipeEnd.querySelector('.camp-swipe-end__subtitle')!.textContent = 'Add some items to the checklist first.';
+      swipeRestartBtn.classList.add('hidden');
+      return;
+    }
+
+    if (swipeIndex >= swipeDeck.length) {
+      swipeActions.classList.add('hidden');
+      swipeEnd.classList.remove('hidden');
+      swipeEnd.querySelector('.camp-swipe-end__title')!.textContent = "🎉 That's the whole deck!";
+      swipeEnd.querySelector('.camp-swipe-end__subtitle')!.textContent = 'Want to play again?';
+      swipeRestartBtn.classList.remove('hidden');
+      return;
+    }
+
+    swipeEnd.classList.add('hidden');
+    swipeActions.classList.remove('hidden');
+
+    const next = swipeDeck[swipeIndex + 1];
+    if (next) swipeStack.appendChild(buildSwipeCard(next, true));
+    swipeStack.appendChild(buildSwipeCard(swipeDeck[swipeIndex], false));
+  }
+
+  function showDogToast() {
+    const toast = document.createElement('div');
+    toast.className = 'camp-swipe-toast';
+    const img = document.createElement('img');
+    img.src = ITEM_ICON_PATHS.dog;
+    img.alt = '';
+    toast.appendChild(img);
+    const msg = document.createElement('p');
+    msg.textContent = 'Wow, so creative! 🐶 (added to the checklist for real)';
+    toast.appendChild(msg);
+    swipeStack.appendChild(toast);
+    setTimeout(() => toast.remove(), 1800);
+  }
+
+  swipeAddBtn.addEventListener('click', () => {
+    swipeAddForm.classList.toggle('hidden');
+    if (!swipeAddForm.classList.contains('hidden')) swipeAddInput.focus();
+  });
+
+  swipeAddForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = swipeAddInput.value.trim();
+    if (!name) return;
+    swipeAddInput.value = '';
+    swipeAddForm.classList.add('hidden');
+    await addItem('Misc.', 'Misc.', name);
+    showDogToast();
+  });
 
   // Auto-enter if a passcode is already stored from a previous visit.
   const stored = getStoredPasscode();
