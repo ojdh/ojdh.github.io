@@ -131,11 +131,13 @@
     margin-top: 0.75rem;
   }
   .camp-avatar-picker button {
-    font-size: 1.5rem;
-    line-height: 1;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 9999px;
+    width: 3.25rem;
+    height: 4.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0.6rem;
     border: 2px solid var(--camp-forest);
     background: var(--camp-card);
     transition: transform 120ms ease;
@@ -146,6 +148,26 @@
   .camp-avatar-picker button[data-selected='true'] {
     background: var(--camp-mustard);
     box-shadow: 3px 3px 0 var(--camp-forest);
+  }
+  .camp-avatar-img {
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .camp-avatar-icon {
+    height: 1.4em;
+    width: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    vertical-align: middle;
+  }
+  .camp-chip-avatar {
+    height: 1.3em;
+    width: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    vertical-align: middle;
   }
 
   .camp-input {
@@ -567,7 +589,23 @@
     'Sujen',
     'River',
   ];
-  const AVATAR_OPTIONS = ['🦝', '🐻', '🦌', '🦉', '🦫', '🐿️', '🐢', '🐸', '🦔', '🐇', '🦡', '🐝'];
+  // Original pixel-art characters (not from the terriblejared tileset — see
+  // public/pixel-camp/ for the licensed campground tiles used elsewhere on
+  // this page). Assignments made before these shipped may still have an
+  // emoji string in `avatar`; appendAvatar() below handles both.
+  const AVATAR_OPTIONS = [
+    '/pixel-camp/avatars/m1.png',
+    '/pixel-camp/avatars/f1.png',
+    '/pixel-camp/avatars/m2.png',
+    '/pixel-camp/avatars/f2.png',
+    '/pixel-camp/avatars/m3.png',
+    '/pixel-camp/avatars/f3.png',
+    '/pixel-camp/avatars/m4.png',
+    '/pixel-camp/avatars/f4.png',
+    '/pixel-camp/avatars/m5.png',
+    '/pixel-camp/avatars/f5.png',
+  ];
+  const FALLBACK_AVATAR_ICONS = ['🎒', '🥾', '🧭', '🔥', '🌲', '⭐'];
 
   let client: ReturnType<typeof createTripClient> | null = null;
   let items: Item[] = [];
@@ -635,7 +673,7 @@
 
   function refreshAvatarHighlight() {
     avatarPickerEl.querySelectorAll('button').forEach((btn) => {
-      btn.dataset.selected = String(btn.textContent === selectedAvatar);
+      btn.dataset.selected = String(btn.dataset.avatarSrc === selectedAvatar);
     });
   }
 
@@ -668,7 +706,12 @@
     for (const avatar of AVATAR_OPTIONS) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.textContent = avatar;
+      btn.dataset.avatarSrc = avatar;
+      const img = document.createElement('img');
+      img.src = avatar;
+      img.alt = '';
+      img.className = 'camp-avatar-img';
+      btn.appendChild(img);
       btn.addEventListener('click', () => {
         selectedAvatar = avatar;
         refreshAvatarHighlight();
@@ -750,7 +793,11 @@
   }
 
   function showApp() {
-    identityDisplay.textContent = `${myAvatar} ${myName}`;
+    identityDisplay.innerHTML = '';
+    if (myAvatar) {
+      appendAvatar(identityDisplay, myAvatar, 'camp-avatar-icon');
+    }
+    identityDisplay.appendChild(document.createTextNode(myName));
     gate.classList.add('hidden');
     nameStep.classList.add('hidden');
     app.classList.remove('hidden');
@@ -876,6 +923,20 @@
     const div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  // Assignments made before the pixel-art avatars shipped stored an emoji
+  // character directly; new ones store an image path. Render either.
+  function appendAvatar(container: HTMLElement, avatar: string, className: string) {
+    if (avatar.startsWith('/')) {
+      const img = document.createElement('img');
+      img.src = avatar;
+      img.alt = '';
+      img.className = className;
+      container.appendChild(img);
+    } else {
+      container.appendChild(document.createTextNode(avatar));
+    }
   }
 
   function renderFilterBar(groupNames: string[]) {
@@ -1028,8 +1089,10 @@
       chip.className = 'camp-chip';
       chip.style.setProperty('--chip-rotate', index % 2 === 0 ? '-2deg' : '2deg');
       if (!previousAssignmentIds.has(a.id)) chip.classList.add('camp-chip--new');
-      const avatarPrefix = a.avatar ? `${a.avatar} ` : '';
-      chip.textContent = `${avatarPrefix}🔥 ${a.person_name}` + (a.note ? ` — ${a.note}` : '');
+      if (a.avatar) appendAvatar(chip, a.avatar, 'camp-chip-avatar');
+      chip.appendChild(
+        document.createTextNode(`🔥 ${a.person_name}` + (a.note ? ` — ${a.note}` : ''))
+      );
       if (a.person_name.trim().toLowerCase() === myName.trim().toLowerCase()) {
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
@@ -1062,8 +1125,6 @@
     return li;
   }
 
-  const SUMMARY_ICONS = ['🎒', '🥾', '🧭', '🔥', '🌲', '⭐'];
-
   function renderSummary() {
     viewSummary.innerHTML = '';
     const byPerson = new Map<
@@ -1089,7 +1150,12 @@
         const heading = document.createElement('h3');
         heading.className = 'camp-summary-person';
         const avatar = claimed[0]?.avatar;
-        heading.textContent = `${avatar ?? SUMMARY_ICONS[index % SUMMARY_ICONS.length]} ${person}`;
+        if (avatar) {
+          appendAvatar(heading, avatar, 'camp-avatar-icon');
+        } else {
+          heading.appendChild(document.createTextNode(FALLBACK_AVATAR_ICONS[index % FALLBACK_AVATAR_ICONS.length]));
+        }
+        heading.appendChild(document.createTextNode(person));
         section.appendChild(heading);
         const list = document.createElement('ul');
         list.className = 'camp-summary-list';

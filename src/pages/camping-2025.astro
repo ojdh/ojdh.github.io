@@ -11,6 +11,30 @@ import TripChecklist from '../components/TripChecklist.astro';
       <h1 class="camp-title">Camping 2026</h1>
       <p class="camp-tagline">Claim what you're bringing, or see who's got what covered.</p>
 
+      <div class="camp-skyline" aria-hidden="true">
+        <div class="camp-sprite-card camp-sprite-card--a">
+          <img src="/pixel-camp/tree.png" alt="" class="camp-skyline__sprite camp-skyline__sprite--tree" />
+        </div>
+        <div class="camp-sprite-card camp-sprite-card--b">
+          <img src="/pixel-camp/trailer.png" alt="" class="camp-skyline__sprite" />
+        </div>
+        <div class="camp-sprite-card camp-sprite-card--a">
+          <img src="/pixel-camp/campfire.png" alt="" class="camp-skyline__sprite" />
+        </div>
+        <div class="camp-sprite-card camp-sprite-card--b">
+          <img src="/pixel-camp/sign.png" alt="" class="camp-skyline__sprite" />
+        </div>
+        <div class="camp-sprite-card camp-sprite-card--a">
+          <img src="/pixel-camp/camper.png" alt="" class="camp-skyline__sprite" />
+        </div>
+        <div class="camp-sprite-card camp-sprite-card--b">
+          <img src="/pixel-camp/tree.png" alt="" class="camp-skyline__sprite camp-skyline__sprite--tree" />
+        </div>
+      </div>
+      <p class="camp-credit">
+        Pixel art by <a href="https://terriblejared.itch.io/terrible-campsite" target="_blank" rel="noopener noreferrer">Jared the Terrible</a> 🏕️
+      </p>
+
       <div class="mt-10">
         <TripChecklist />
       </div>
@@ -67,5 +91,55 @@ import TripChecklist from '../components/TripChecklist.astro';
     text-align: center;
     color: var(--camp-forest-deep);
     opacity: 0.75;
+  }
+
+  .camp-skyline {
+    margin-top: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .camp-sprite-card {
+    background: var(--camp-card);
+    border: 2px solid var(--camp-forest);
+    border-radius: 0.6rem;
+    padding: 0.35rem;
+    box-shadow: 3px 3px 0 var(--camp-forest);
+    display: flex;
+    align-items: flex-end;
+  }
+  .camp-sprite-card--a {
+    transform: rotate(-2deg);
+  }
+  .camp-sprite-card--b {
+    transform: rotate(2deg);
+  }
+  .camp-skyline__sprite {
+    display: block;
+    height: 3.75rem;
+    width: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .camp-skyline__sprite--tree {
+    height: 4.75rem;
+  }
+
+  .camp-credit {
+    margin-top: 0.6rem;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--camp-forest-deep);
+    opacity: 0.55;
+  }
+  .camp-credit a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+  .camp-credit a:hover {
+    opacity: 1;
   }
 </style>
