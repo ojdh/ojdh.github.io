@@ -103,6 +103,30 @@ body {
   font-style: italic;
   margin-bottom: 1.1rem;
 }
+.prose-content .post-figure {
+  margin: 2rem 0;
+}
+.prose-content .post-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.prose-content .post-figure__caption {
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-align: center;
+}
+.prose-content .post-figure--wide {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+.prose-content .post-figure--wide img {
+  border-radius: 0;
+}
 
 /* Reusable bits */
 .link-underline {

@@ -1,0 +1,388 @@
+---
+---
+
+<div id="gate" class="mx-auto max-w-sm py-10 text-center">
+  <p class="text-[var(--color-muted)]">Enter the trip passcode to view and edit the checklist.</p>
+  <form id="gate-form" class="mt-4 flex gap-2">
+    <input
+      type="password"
+      id="gate-passcode"
+      placeholder="Trip passcode"
+      autocomplete="off"
+      class="flex-1 rounded-lg border border-[var(--color-faint)] bg-[var(--color-surface)] px-3 py-2 text-[var(--color-ink)]"
+    />
+    <button
+      type="submit"
+      class="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white"
+    >
+      Enter
+    </button>
+  </form>
+  <p id="gate-error" class="mt-3 hidden text-sm text-[var(--color-accent)]"></p>
+</div>
+
+<div id="app" class="hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex gap-2">
+      <button data-view="checklist" class="tab-btn" data-active="true">Checklist</button>
+      <button data-view="summary" class="tab-btn" data-active="false">Who's Bringing What</button>
+    </div>
+    <label class="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+      Your name
+      <input
+        id="your-name"
+        placeholder="e.g. Riza"
+        class="rounded-lg border border-[var(--color-faint)] bg-[var(--color-surface)] px-2.5 py-1.5 text-[var(--color-ink)]"
+      />
+    </label>
+  </div>
+
+  <div id="view-checklist" class="mt-8 space-y-10">
+    <div id="groups"></div>
+
+    <form id="add-item-form" class="flex flex-wrap items-end gap-3 border-t border-[var(--color-faint)] pt-6">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--color-muted)]">Group</label>
+        <select
+          id="add-item-group"
+          class="rounded-lg border border-[var(--color-faint)] bg-[var(--color-surface)] px-2.5 py-1.5 text-sm text-[var(--color-ink)]"
+        >
+          <option>Camping Basics</option>
+          <option>Personal</option>
+          <option>Food</option>
+          <option>Cooking Gear</option>
+          <option>Misc.</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--color-muted)]">Category</label>
+        <input
+          id="add-item-category"
+          list="category-options"
+          placeholder="e.g. Snacks"
+          class="w-40 rounded-lg border border-[var(--color-faint)] bg-[var(--color-surface)] px-2.5 py-1.5 text-sm text-[var(--color-ink)]"
+        />
+        <datalist id="category-options"></datalist>
+      </div>
+      <div class="flex flex-1 flex-col gap-1">
+        <label class="text-xs text-[var(--color-muted)]">Item name</label>
+        <input
+          id="add-item-name"
+          placeholder="e.g. Extra tarp"
+          required
+          class="w-full rounded-lg border border-[var(--color-faint)] bg-[var(--color-surface)] px-2.5 py-1.5 text-sm text-[var(--color-ink)]"
+        />
+      </div>
+      <button
+        type="submit"
+        class="rounded-lg border border-[var(--color-faint)] px-3 py-1.5 text-sm font-medium text-[var(--color-ink)]"
+      >
+        Add item
+      </button>
+    </form>
+  </div>
+
+  <div id="view-summary" class="mt-8 hidden space-y-6"></div>
+</div>
+
+<style>
+  .tab-btn {
+    border-radius: 9999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+  .tab-btn[data-active='true'] {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 9999px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
+  .chip button {
+    color: var(--color-accent);
+    font-weight: 600;
+    line-height: 1;
+  }
+</style>
+
+<script>
+  import {
+    createTripClient,
+    getStoredPasscode,
+    storePasscode,
+    clearStoredPasscode,
+  } from '../lib/supabase';
+
+  interface Item {
+    id: string;
+    group_name: string;
+    category: string;
+    name: string;
+    sort_order: number;
+  }
+  interface Assignment {
+    id: string;
+    item_id: string;
+    person_name: string;
+    note: string | null;
+  }
+
+  const NAME_STORAGE_KEY = 'camping-2025-name';
+
+  let client: ReturnType<typeof createTripClient> | null = null;
+  let items: Item[] = [];
+  let assignments: Assignment[] = [];
+
+  const gate = document.getElementById('gate')!;
+  const gateForm = document.getElementById('gate-form') as HTMLFormElement;
+  const gatePasscodeInput = document.getElementById('gate-passcode') as HTMLInputElement;
+  const gateError = document.getElementById('gate-error')!;
+  const app = document.getElementById('app')!;
+  const groupsEl = document.getElementById('groups')!;
+  const viewChecklist = document.getElementById('view-checklist')!;
+  const viewSummary = document.getElementById('view-summary')!;
+  const yourNameInput = document.getElementById('your-name') as HTMLInputElement;
+  const addItemForm = document.getElementById('add-item-form') as HTMLFormElement;
+  const addItemGroup = document.getElementById('add-item-group') as HTMLSelectElement;
+  const addItemCategory = document.getElementById('add-item-category') as HTMLInputElement;
+  const addItemName = document.getElementById('add-item-name') as HTMLInputElement;
+  const categoryOptions = document.getElementById('category-options') as HTMLDataListElement;
+
+  yourNameInput.value = localStorage.getItem(NAME_STORAGE_KEY) ?? '';
+  yourNameInput.addEventListener('input', () => {
+    localStorage.setItem(NAME_STORAGE_KEY, yourNameInput.value.trim());
+  });
+
+  async function tryEnter(passcode: string) {
+    try {
+      const candidate = createTripClient(passcode);
+      const { data, error } = await candidate.from('items').select('*').order('sort_order');
+      // RLS silently returns zero rows (not an error) for a wrong passcode,
+      // so an empty result is our signal to reject rather than a real error.
+      if (error || !data || data.length === 0) {
+        return false;
+      }
+      client = candidate;
+      items = data as Item[];
+      storePasscode(passcode);
+      await refreshAssignments();
+      showApp();
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  async function refreshAssignments() {
+    if (!client) return;
+    const { data } = await client.from('assignments').select('*');
+    assignments = (data as Assignment[]) ?? [];
+    render();
+  }
+
+  function showApp() {
+    gate.classList.add('hidden');
+    app.classList.remove('hidden');
+  }
+
+  gateForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ok = await tryEnter(gatePasscodeInput.value);
+    if (!ok) {
+      gateError.textContent = 'Wrong passcode — try again.';
+      gateError.classList.remove('hidden');
+    }
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.tab-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll<HTMLButtonElement>('.tab-btn').forEach((b) => (b.dataset.active = 'false'));
+      btn.dataset.active = 'true';
+      const view = btn.dataset.view;
+      viewChecklist.classList.toggle('hidden', view !== 'checklist');
+      viewSummary.classList.toggle('hidden', view !== 'summary');
+    });
+  });
+
+  async function claimItem(itemId: string, note: string) {
+    const name = yourNameInput.value.trim();
+    if (!name || !client) return;
+    await client.from('assignments').insert({ item_id: itemId, person_name: name, note: note || null });
+    await refreshAssignments();
+  }
+
+  async function unclaim(assignmentId: string) {
+    if (!client) return;
+    await client.from('assignments').delete().eq('id', assignmentId);
+    await refreshAssignments();
+  }
+
+  addItemForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!client) return;
+    const group = addItemGroup.value;
+    const category = addItemCategory.value.trim() || group;
+    const name = addItemName.value.trim();
+    if (!name) return;
+    const sortOrder = items.reduce((max, i) => Math.max(max, i.sort_order), 0) + 1;
+    const { data } = await client
+      .from('items')
+      .insert({ group_name: group, category, name, sort_order: sortOrder })
+      .select();
+    if (data) items.push(...(data as Item[]));
+    addItemName.value = '';
+    render();
+  });
+
+  function render() {
+    renderCategoryOptions();
+    renderChecklist();
+    renderSummary();
+  }
+
+  function renderCategoryOptions() {
+    const categories = Array.from(new Set(items.map((i) => i.category)));
+    categoryOptions.innerHTML = categories.map((c) => `<option value="${escapeHtml(c)}"></option>`).join('');
+  }
+
+  function escapeHtml(s: string) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function renderChecklist() {
+    groupsEl.innerHTML = '';
+    const groupOrder = ['Camping Basics', 'Personal', 'Food', 'Cooking Gear', 'Misc.'];
+    const groupNames = Array.from(new Set(items.map((i) => i.group_name))).sort(
+      (a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b)
+    );
+
+    for (const groupName of groupNames) {
+      const groupItems = items.filter((i) => i.group_name === groupName);
+      const groupSection = document.createElement('section');
+      const heading = document.createElement('h2');
+      heading.className = 'font-serif text-2xl font-semibold text-[var(--color-ink)]';
+      heading.textContent = groupName;
+      groupSection.appendChild(heading);
+
+      const categories = Array.from(new Set(groupItems.map((i) => i.category)));
+      for (const category of categories) {
+        const categoryItems = groupItems.filter((i) => i.category === category);
+        if (category !== groupName) {
+          const catHeading = document.createElement('h3');
+          catHeading.className = 'mt-5 text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]';
+          catHeading.textContent = category;
+          groupSection.appendChild(catHeading);
+        }
+        const list = document.createElement('ul');
+        list.className = 'mt-3 divide-y divide-[var(--color-faint)]';
+        for (const item of categoryItems) {
+          list.appendChild(renderItemRow(item));
+        }
+        groupSection.appendChild(list);
+      }
+      groupsEl.appendChild(groupSection);
+    }
+  }
+
+  function renderItemRow(item: Item): HTMLLIElement {
+    const li = document.createElement('li');
+    li.className = 'flex flex-wrap items-center justify-between gap-2 py-3';
+
+    const left = document.createElement('div');
+    left.className = 'flex flex-wrap items-center gap-2';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'text-[var(--color-ink)]';
+    nameSpan.textContent = item.name;
+    left.appendChild(nameSpan);
+
+    const itemAssignments = assignments.filter((a) => a.item_id === item.id);
+    const myName = yourNameInput.value.trim().toLowerCase();
+    for (const a of itemAssignments) {
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = a.person_name + (a.note ? ` — ${a.note}` : '');
+      if (a.person_name.trim().toLowerCase() === myName) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = '×';
+        removeBtn.addEventListener('click', () => unclaim(a.id));
+        chip.appendChild(removeBtn);
+      }
+      left.appendChild(chip);
+    }
+
+    const right = document.createElement('form');
+    right.className = 'flex items-center gap-1.5';
+    right.addEventListener('submit', (e) => {
+      e.preventDefault();
+      claimItem(item.id, noteInput.value.trim());
+      noteInput.value = '';
+    });
+    const noteInput = document.createElement('input');
+    noteInput.placeholder = 'note (optional)';
+    noteInput.className =
+      'w-28 rounded-lg border border-[var(--color-faint)] bg-[var(--color-surface)] px-2 py-1 text-xs text-[var(--color-ink)]';
+    const claimBtn = document.createElement('button');
+    claimBtn.type = 'submit';
+    claimBtn.textContent = "I'll bring this";
+    claimBtn.className = 'whitespace-nowrap rounded-lg border border-[var(--color-faint)] px-2.5 py-1 text-xs font-medium text-[var(--color-ink)]';
+    right.appendChild(noteInput);
+    right.appendChild(claimBtn);
+
+    li.appendChild(left);
+    li.appendChild(right);
+    return li;
+  }
+
+  function renderSummary() {
+    viewSummary.innerHTML = '';
+    const byPerson = new Map<string, { itemName: string; note: string | null }[]>();
+    for (const a of assignments) {
+      const item = items.find((i) => i.id === a.item_id);
+      if (!item) continue;
+      const list = byPerson.get(a.person_name) ?? [];
+      list.push({ itemName: item.name, note: a.note });
+      byPerson.set(a.person_name, list);
+    }
+    if (byPerson.size === 0) {
+      viewSummary.innerHTML = '<p class="text-[var(--color-muted)]">Nobody has claimed anything yet.</p>';
+      return;
+    }
+    for (const [person, claimed] of Array.from(byPerson.entries()).sort((a, b) => a[0].localeCompare(b[0]))) {
+      const section = document.createElement('div');
+      const heading = document.createElement('h3');
+      heading.className = 'font-serif text-xl font-semibold text-[var(--color-ink)]';
+      heading.textContent = person;
+      section.appendChild(heading);
+      const list = document.createElement('ul');
+      list.className = 'mt-2 list-inside list-disc text-[var(--color-ink)]';
+      for (const c of claimed) {
+        const li = document.createElement('li');
+        li.textContent = c.itemName + (c.note ? ` — ${c.note}` : '');
+        list.appendChild(li);
+      }
+      section.appendChild(list);
+      viewSummary.appendChild(section);
+    }
+  }
+
+  // Auto-enter if a passcode is already stored from a previous visit.
+  const stored = getStoredPasscode();
+  if (stored) {
+    tryEnter(stored).then((ok) => {
+      if (!ok) clearStoredPasscode();
+    });
+  }
+</script>
