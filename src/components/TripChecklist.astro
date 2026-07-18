@@ -226,6 +226,15 @@
     await refreshAssignments();
   }
 
+  async function removeItem(item: Item) {
+    if (!client) return;
+    if (!confirm(`Remove "${item.name}"? This also clears anyone's claim on it.`)) return;
+    await client.from('items').delete().eq('id', item.id);
+    items = items.filter((i) => i.id !== item.id);
+    assignments = assignments.filter((a) => a.item_id !== item.id);
+    render();
+  }
+
   addItemForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!client) return;
@@ -306,6 +315,14 @@
     nameSpan.className = 'text-[var(--color-ink)]';
     nameSpan.textContent = item.name;
     left.appendChild(nameSpan);
+
+    const removeItemBtn = document.createElement('button');
+    removeItemBtn.type = 'button';
+    removeItemBtn.textContent = 'remove';
+    removeItemBtn.title = 'Remove this item from the checklist';
+    removeItemBtn.className = 'text-xs text-[var(--color-muted)] underline decoration-dotted hover:text-[var(--color-accent)]';
+    removeItemBtn.addEventListener('click', () => removeItem(item));
+    left.appendChild(removeItemBtn);
 
     const itemAssignments = assignments.filter((a) => a.item_id === item.id);
     const myName = yourNameInput.value.trim().toLowerCase();
