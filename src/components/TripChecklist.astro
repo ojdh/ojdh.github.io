@@ -29,6 +29,7 @@
   </div>
 
   <div id="view-checklist" class="mt-8 space-y-8">
+    <nav id="quick-nav" class="camp-quicknav" aria-label="Jump to section"></nav>
     <div id="groups"></div>
 
     <form id="add-item-form" class="camp-add-form">
@@ -187,8 +188,30 @@
     color: var(--camp-forest-deep);
   }
 
+  .camp-quicknav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .camp-quicknav a {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--camp-forest);
+    background: var(--camp-card);
+    border: 2px solid var(--camp-forest);
+    border-radius: 9999px;
+    padding: 0.3rem 0.8rem;
+    transition: transform 120ms ease;
+  }
+  .camp-quicknav a:hover {
+    transform: translateY(-2px);
+    background: var(--camp-mustard);
+  }
+
   .camp-group {
     margin-top: 2rem;
+    scroll-margin-top: 1.5rem;
   }
   .camp-group__badge {
     display: inline-flex;
@@ -202,9 +225,23 @@
     border-radius: 9999px;
     padding: 0.5rem 1.25rem;
     transform: rotate(-0.6deg);
+    cursor: pointer;
+    user-select: none;
+  }
+  .camp-group__badge::marker,
+  .camp-group__badge::-webkit-details-marker {
+    content: '';
+    display: none;
   }
   .camp-group__icon {
     font-size: 1.15rem;
+  }
+  .camp-chevron {
+    display: inline-block;
+    transition: transform 150ms ease;
+  }
+  details[open] > .camp-group__badge .camp-chevron {
+    transform: rotate(90deg);
   }
   .camp-category {
     margin-top: 1rem;
@@ -300,6 +337,24 @@
       opacity: 1;
     }
   }
+  .camp-removing {
+    animation: camp-rain-out 380ms ease-in forwards;
+    pointer-events: none;
+  }
+  @keyframes camp-rain-out {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.85) translateY(8px);
+    }
+  }
 
   .camp-claim-form {
     display: flex;
@@ -358,6 +413,10 @@
   }
   .camp-summary-list li {
     list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     padding: 0.3rem 0;
     padding-left: 1.4rem;
     position: relative;
@@ -368,6 +427,18 @@
     position: absolute;
     left: 0;
     font-size: 0.8rem;
+  }
+  .camp-summary-item__remove {
+    font-size: 0.7rem;
+    color: var(--camp-forest-deep);
+    opacity: 0.4;
+    border-radius: 9999px;
+    padding: 0.05rem 0.4rem;
+  }
+  .camp-summary-item__remove:hover {
+    opacity: 1;
+    color: var(--camp-rust-deep);
+    background: color-mix(in srgb, var(--camp-rust) 15%, transparent);
   }
 </style>
 
@@ -411,12 +482,24 @@
   let items: Item[] = [];
   let assignments: Assignment[] = [];
   let previousAssignmentIds = new Set<string>();
+  const collapsedGroups = new Set<string>();
+
+  function slugify(s: string) {
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  function triggerRainRemoval(el: HTMLElement, assignmentId: string) {
+    el.classList.add('camp-removing');
+    el.insertAdjacentHTML('beforeend', ' <span>🌧️</span>');
+    setTimeout(() => unclaim(assignmentId), 380);
+  }
 
   const gate = document.getElementById('gate')!;
   const gateForm = document.getElementById('gate-form') as HTMLFormElement;
   const gatePasscodeInput = document.getElementById('gate-passcode') as HTMLInputElement;
   const gateError = document.getElementById('gate-error')!;
   const app = document.getElementById('app')!;
+  const quickNavEl = document.getElementById('quick-nav')!;
   const groupsEl = document.getElementById('groups')!;
   const viewChecklist = document.getElementById('view-checklist')!;
   const viewSummary = document.getElementById('view-summary')!;
@@ -499,7 +582,6 @@
 
   async function removeItem(item: Item) {
     if (!client) return;
-    if (!confirm(`Remove "${item.name}"? This also clears anyone's claim on it.`)) return;
     await client.from('items').delete().eq('id', item.id);
     items = items.filter((i) => i.id !== item.id);
     assignments = assignments.filter((a) => a.item_id !== item.id);
@@ -542,20 +624,42 @@
 
   function renderChecklist() {
     groupsEl.innerHTML = '';
+    quickNavEl.innerHTML = '';
     const groupNames = Array.from(new Set(items.map((i) => i.group_name))).sort(
       (a, b) => GROUP_ORDER.indexOf(a) - GROUP_ORDER.indexOf(b)
     );
 
     groupNames.forEach((groupName, groupIndex) => {
+      const groupId = `group-${slugify(groupName)}`;
+      const icon = GROUP_ICONS[groupName] ?? '🏕️';
+
+      const navLink = document.createElement('a');
+      navLink.href = `#${groupId}`;
+      navLink.textContent = `${icon} ${groupName}`;
+      navLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        collapsedGroups.delete(groupName);
+        const target = document.getElementById(groupId);
+        if (target instanceof HTMLDetailsElement) target.open = true;
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      quickNavEl.appendChild(navLink);
+
       if (groupIndex > 0) groupsEl.appendChild(document.createElement('hr')).className = 'camp-trail';
 
       const groupItems = items.filter((i) => i.group_name === groupName);
-      const groupSection = document.createElement('section');
+      const groupSection = document.createElement('details');
       groupSection.className = 'camp-group';
+      groupSection.id = groupId;
+      groupSection.open = !collapsedGroups.has(groupName);
+      groupSection.addEventListener('toggle', () => {
+        if (groupSection.open) collapsedGroups.delete(groupName);
+        else collapsedGroups.add(groupName);
+      });
 
-      const heading = document.createElement('h2');
+      const heading = document.createElement('summary');
       heading.className = 'camp-group__badge';
-      heading.innerHTML = `<span class="camp-group__icon">${GROUP_ICONS[groupName] ?? '🏕️'}</span> ${escapeHtml(groupName)}`;
+      heading.innerHTML = `<span class="camp-chevron">▸</span><span class="camp-group__icon">${icon}</span> ${escapeHtml(groupName)}`;
       groupSection.appendChild(heading);
 
       const categories = Array.from(new Set(groupItems.map((i) => i.category)));
@@ -595,7 +699,12 @@
     removeItemBtn.textContent = '✕';
     removeItemBtn.title = 'Remove this item from the checklist';
     removeItemBtn.className = 'camp-item__remove';
-    removeItemBtn.addEventListener('click', () => removeItem(item));
+    removeItemBtn.addEventListener('click', () => {
+      if (!confirm(`Remove "${item.name}"? This also clears anyone's claim on it.`)) return;
+      li.classList.add('camp-removing');
+      li.insertAdjacentHTML('beforeend', ' <span>🌧️</span>');
+      setTimeout(() => removeItem(item), 380);
+    });
     left.appendChild(removeItemBtn);
 
     const itemAssignments = assignments.filter((a) => a.item_id === item.id);
@@ -605,12 +714,12 @@
       chip.className = 'camp-chip';
       chip.style.setProperty('--chip-rotate', index % 2 === 0 ? '-2deg' : '2deg');
       if (!previousAssignmentIds.has(a.id)) chip.classList.add('camp-chip--new');
-      chip.textContent = a.person_name + (a.note ? ` — ${a.note}` : '');
+      chip.textContent = `🔥 ${a.person_name}` + (a.note ? ` — ${a.note}` : '');
       if (a.person_name.trim().toLowerCase() === myName) {
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
         removeBtn.textContent = '×';
-        removeBtn.addEventListener('click', () => unclaim(a.id));
+        removeBtn.addEventListener('click', () => triggerRainRemoval(chip, a.id));
         chip.appendChild(removeBtn);
       }
       left.appendChild(chip);
@@ -640,12 +749,12 @@
 
   function renderSummary() {
     viewSummary.innerHTML = '';
-    const byPerson = new Map<string, { itemName: string; note: string | null }[]>();
+    const byPerson = new Map<string, { assignmentId: string; itemName: string; note: string | null }[]>();
     for (const a of assignments) {
       const item = items.find((i) => i.id === a.item_id);
       if (!item) continue;
       const list = byPerson.get(a.person_name) ?? [];
-      list.push({ itemName: item.name, note: a.note });
+      list.push({ assignmentId: a.id, itemName: item.name, note: a.note });
       byPerson.set(a.person_name, list);
     }
     if (byPerson.size === 0) {
@@ -653,6 +762,7 @@
         '<p class="text-[var(--camp-forest-deep)]">🌲 Nobody has claimed anything yet.</p>';
       return;
     }
+    const myName = yourNameInput.value.trim().toLowerCase();
     Array.from(byPerson.entries())
       .sort((a, b) => a[0].localeCompare(b[0]))
       .forEach(([person, claimed], index) => {
@@ -665,7 +775,18 @@
         list.className = 'camp-summary-list';
         for (const c of claimed) {
           const li = document.createElement('li');
-          li.textContent = c.itemName + (c.note ? ` — ${c.note}` : '');
+          const textSpan = document.createElement('span');
+          textSpan.textContent = c.itemName + (c.note ? ` — ${c.note}` : '');
+          li.appendChild(textSpan);
+          if (person.trim().toLowerCase() === myName) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = '✕';
+            removeBtn.title = 'Remove this claim';
+            removeBtn.className = 'camp-summary-item__remove';
+            removeBtn.addEventListener('click', () => triggerRainRemoval(li, c.assignmentId));
+            li.appendChild(removeBtn);
+          }
           list.appendChild(li);
         }
         section.appendChild(list);
