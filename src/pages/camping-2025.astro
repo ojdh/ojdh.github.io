@@ -1,19 +1,71 @@
 ---
+import '@fontsource-variable/fredoka';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TripChecklist from '../components/TripChecklist.astro';
 ---
 
 <BaseLayout title="Camping 2025" description="Who's bringing what for the 2025 camping trip.">
-  <section class="mx-auto max-w-3xl px-6 py-16">
-    <h1 class="font-serif text-4xl font-semibold tracking-tight text-[var(--color-ink)]">
-      Camping 2025 Checklist
-    </h1>
-    <p class="mt-4 max-w-xl leading-relaxed text-[var(--color-muted)]">
-      Claim what you're bringing, or see who's got what covered.
-    </p>
+  <section class="camp-theme px-6 py-16">
+    <div class="mx-auto max-w-3xl">
+      <div class="camp-badge" aria-hidden="true">🏕️</div>
+      <h1 class="camp-title">Camping 2025</h1>
+      <p class="camp-tagline">Claim what you're bringing, or see who's got what covered.</p>
 
-    <div class="mt-10">
-      <TripChecklist />
+      <div class="mt-10">
+        <TripChecklist />
+      </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .camp-theme {
+    --camp-forest: #2f5233;
+    --camp-forest-deep: #1e3a22;
+    --camp-cream: #fbf1de;
+    --camp-card: #fffaf0;
+    --camp-mustard: #e0a83c;
+    --camp-mustard-deep: #b8822a;
+    --camp-rust: #c1502e;
+    --camp-rust-deep: #8f3a20;
+    --camp-ink: #2b2117;
+    --font-display: 'Fredoka Variable', ui-rounded, sans-serif;
+
+    background: var(--camp-cream);
+    min-height: 100vh;
+  }
+
+  .camp-badge {
+    width: 5.5rem;
+    height: 5.5rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.75rem;
+    background: var(--camp-mustard);
+    border: 3px dashed var(--camp-forest);
+    border-radius: 9999px;
+    box-shadow: 4px 4px 0 var(--camp-forest);
+  }
+
+  .camp-title {
+    margin-top: 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.75rem;
+    text-align: center;
+    letter-spacing: 0.02em;
+    color: var(--camp-forest);
+    transform: rotate(-1.5deg);
+  }
+
+  .camp-tagline {
+    margin-top: 0.75rem;
+    max-width: 32rem;
+    margin-inline: auto;
+    text-align: center;
+    color: var(--camp-forest-deep);
+    opacity: 0.75;
+  }
+</style>
