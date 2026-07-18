@@ -19,6 +19,7 @@ create table if not exists public.assignments (
   id uuid primary key default gen_random_uuid(),
   item_id uuid not null references public.items(id) on delete cascade,
   person_name text not null,
+  avatar text,
   note text,
   created_at timestamptz not null default now()
 );

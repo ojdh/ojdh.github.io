@@ -16,52 +16,40 @@
   <p id="gate-error" class="camp-gate__error hidden"></p>
 </div>
 
+<div id="name-step" class="camp-gate hidden">
+  <p class="camp-gate__label">👋 What should we call you?</p>
+  <div id="name-roster" class="camp-roster"></div>
+  <input id="name-other-input" placeholder="Type your name" class="camp-input hidden camp-other-input" />
+  <p class="camp-gate__label camp-avatar-label">Pick an avatar</p>
+  <div id="avatar-picker" class="camp-avatar-picker"></div>
+  <button id="name-step-continue" type="button" class="camp-btn camp-btn--mustard camp-continue-btn" disabled>
+    Let's go →
+  </button>
+</div>
+
 <div id="app" class="hidden">
   <div class="camp-toolbar">
     <div class="camp-tabs">
       <button data-view="checklist" class="camp-tab" data-active="true">📋 Checklist</button>
       <button data-view="summary" class="camp-tab" data-active="false">🎒 Who's Bringing What</button>
     </div>
-    <label class="camp-name-field">
-      Your name
-      <input id="your-name" placeholder="e.g. Riza" class="camp-input camp-input--sm" />
-    </label>
+    <div class="camp-identity">
+      <span id="identity-display"></span>
+      <button id="identity-change" type="button" class="camp-identity__change">change</button>
+    </div>
   </div>
 
   <div id="view-checklist" class="mt-8 space-y-8">
-    <nav id="quick-nav" class="camp-quicknav" aria-label="Jump to section"></nav>
+    <nav id="filter-bar" class="camp-quicknav" aria-label="Filter by section"></nav>
+    <div id="bulk-bar" class="camp-bulk-bar hidden">
+      <span id="bulk-count"></span>
+      <input id="bulk-note" placeholder="note for all (optional)" class="camp-input camp-input--sm" />
+      <button id="bulk-claim-btn" type="button" class="camp-btn camp-btn--mustard camp-btn--sm">
+        🙋 I'll bring these
+      </button>
+      <button id="bulk-clear-btn" type="button" class="camp-btn camp-btn--sm">Clear</button>
+    </div>
     <div id="groups"></div>
-
-    <form id="add-item-form" class="camp-add-form">
-      <p class="camp-add-form__heading">📝 Add something new</p>
-      <div class="camp-add-form__row">
-        <div class="camp-field">
-          <label class="camp-field__label">Group</label>
-          <select id="add-item-group" class="camp-input camp-input--sm">
-            <option>Camping Basics</option>
-            <option>Personal</option>
-            <option>Food</option>
-            <option>Cooking Gear</option>
-            <option>Misc.</option>
-          </select>
-        </div>
-        <div class="camp-field">
-          <label class="camp-field__label">Category</label>
-          <input
-            id="add-item-category"
-            list="category-options"
-            placeholder="e.g. Snacks"
-            class="camp-input camp-input--sm camp-input--w40"
-          />
-          <datalist id="category-options"></datalist>
-        </div>
-        <div class="camp-field camp-field--grow">
-          <label class="camp-field__label">Item name</label>
-          <input id="add-item-name" placeholder="e.g. Extra tarp" required class="camp-input camp-input--sm" />
-        </div>
-        <button type="submit" class="camp-btn camp-btn--mustard camp-btn--sm">Add item</button>
-      </div>
-    </form>
   </div>
 
   <div id="view-summary" class="mt-8 hidden space-y-6"></div>
@@ -69,7 +57,7 @@
 
 <style is:global>
   .camp-gate {
-    max-width: 26rem;
+    max-width: 30rem;
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
@@ -94,6 +82,71 @@
     font-weight: 600;
     color: var(--camp-rust-deep);
   }
+  .camp-other-input {
+    margin-top: 0.75rem;
+  }
+  .camp-avatar-label {
+    margin-top: 1.5rem;
+  }
+  .camp-continue-btn {
+    margin-top: 1.25rem;
+  }
+  .camp-continue-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .camp-roster {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .camp-roster button {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 2px solid var(--camp-forest);
+    border-radius: 9999px;
+    padding: 0.4rem 0.9rem;
+    color: var(--camp-forest);
+    background: var(--camp-card);
+    transition: transform 120ms ease;
+  }
+  .camp-roster button:hover {
+    transform: translateY(-2px);
+  }
+  .camp-roster button[data-selected='true'] {
+    background: var(--camp-forest);
+    color: var(--camp-cream);
+  }
+
+  .camp-avatar-picker {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  .camp-avatar-picker button {
+    font-size: 1.5rem;
+    line-height: 1;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    border: 2px solid var(--camp-forest);
+    background: var(--camp-card);
+    transition: transform 120ms ease;
+  }
+  .camp-avatar-picker button:hover {
+    transform: translateY(-2px);
+  }
+  .camp-avatar-picker button[data-selected='true'] {
+    background: var(--camp-mustard);
+    box-shadow: 3px 3px 0 var(--camp-forest);
+  }
 
   .camp-input {
     flex: 1;
@@ -111,9 +164,6 @@
     padding: 0.4rem 0.7rem;
     font-size: 0.875rem;
     flex: initial;
-  }
-  .camp-input--w40 {
-    width: 10rem;
   }
 
   .camp-btn {
@@ -179,13 +229,23 @@
     color: var(--camp-cream);
     box-shadow: 3px 3px 0 var(--camp-rust);
   }
-  .camp-name-field {
+  .camp-identity {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--camp-forest-deep);
+  }
+  .camp-identity__change {
+    font-size: 0.72rem;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    color: var(--camp-forest-deep);
+    opacity: 0.65;
+  }
+  .camp-identity__change:hover {
+    opacity: 1;
   }
 
   .camp-quicknav {
@@ -193,7 +253,7 @@
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  .camp-quicknav a {
+  .camp-filter {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 0.8rem;
@@ -204,9 +264,34 @@
     padding: 0.3rem 0.8rem;
     transition: transform 120ms ease;
   }
-  .camp-quicknav a:hover {
+  .camp-filter:hover {
     transform: translateY(-2px);
+  }
+  .camp-filter--active {
+    background: var(--camp-forest);
+    color: var(--camp-cream);
+  }
+
+  .camp-bulk-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
     background: var(--camp-mustard);
+    border: 2.5px solid var(--camp-forest);
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+  }
+  .camp-bulk-bar.hidden {
+    display: none;
+  }
+  .camp-bulk-bar input {
+    width: 12rem;
+  }
+  #bulk-count {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--camp-forest-deep);
   }
 
   .camp-group {
@@ -281,27 +366,49 @@
     box-shadow: 3px 3px 0 var(--camp-mustard);
     transform: translateY(-1px);
   }
+  .camp-item--add {
+    border-style: dotted;
+    opacity: 0.85;
+  }
   .camp-item__left {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.4rem;
   }
+  .camp-item__checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--camp-forest);
+  }
   .camp-item__name {
     color: var(--camp-ink);
     font-weight: 500;
   }
+  .camp-item__edit,
   .camp-item__remove {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--camp-forest-deep);
     opacity: 0.35;
     border-radius: 9999px;
     padding: 0.1rem 0.4rem;
   }
+  .camp-item__edit:hover {
+    opacity: 1;
+  }
   .camp-item__remove:hover {
     opacity: 1;
     color: var(--camp-rust-deep);
     background: color-mix(in srgb, var(--camp-rust) 15%, transparent);
+  }
+
+  .camp-add-inline {
+    display: flex;
+    gap: 0.4rem;
+    width: 100%;
+  }
+  .camp-add-inline input {
+    flex: 1;
   }
 
   .camp-chip {
@@ -363,39 +470,6 @@
   }
   .camp-claim-form input {
     width: 7.5rem;
-  }
-
-  .camp-add-form {
-    border-top: 3px dashed var(--camp-forest);
-    padding-top: 1.5rem;
-  }
-  .camp-add-form__heading {
-    font-family: var(--font-display);
-    font-weight: 600;
-    color: var(--camp-forest);
-    margin-bottom: 0.75rem;
-  }
-  .camp-add-form__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: 0.75rem;
-  }
-  .camp-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-  .camp-field--grow {
-    flex: 1;
-  }
-  .camp-field__label {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--camp-forest-deep);
-    opacity: 0.7;
   }
 
   .camp-summary-person {
@@ -461,10 +535,12 @@
     id: string;
     item_id: string;
     person_name: string;
+    avatar: string | null;
     note: string | null;
   }
 
   const NAME_STORAGE_KEY = 'camping-2025-name';
+  const AVATAR_STORAGE_KEY = 'camping-2025-avatar';
   const GROUP_ORDER = ['Camping Basics', 'Personal', 'Food', 'Cooking Gear', 'Misc.'];
   const GROUP_ICONS: Record<string, string> = {
     'Camping Basics': '⛺',
@@ -476,13 +552,35 @@
   const CATEGORY_ICONS: Record<string, string> = {
     'Recreation / Fun': '🎲',
   };
-  const SUMMARY_ICONS = ['🎒', '🥾', '🧭', '🔥', '🌲', '⭐'];
+  const NAME_ROSTER = [
+    'Oj',
+    'Sam',
+    'Osric',
+    'Eliza',
+    'Bristi',
+    'Doyle',
+    'Marco',
+    'Swapnil',
+    'Riza',
+    'Prayas',
+    'Rubi',
+    'Sujen',
+    'River',
+  ];
+  const AVATAR_OPTIONS = ['🦝', '🐻', '🦌', '🦉', '🦫', '🐿️', '🐢', '🐸', '🦔', '🐇', '🦡', '🐝'];
 
   let client: ReturnType<typeof createTripClient> | null = null;
   let items: Item[] = [];
   let assignments: Assignment[] = [];
   let previousAssignmentIds = new Set<string>();
   const collapsedGroups = new Set<string>();
+  const selectedItemIds = new Set<string>();
+  let activeFilter: string | null = null;
+
+  let myName = localStorage.getItem(NAME_STORAGE_KEY) ?? '';
+  let myAvatar = localStorage.getItem(AVATAR_STORAGE_KEY) ?? '';
+  let selectedRosterName: string | null = null;
+  let selectedAvatar: string | null = null;
 
   function slugify(s: string) {
     return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -498,22 +596,125 @@
   const gateForm = document.getElementById('gate-form') as HTMLFormElement;
   const gatePasscodeInput = document.getElementById('gate-passcode') as HTMLInputElement;
   const gateError = document.getElementById('gate-error')!;
+  const nameStep = document.getElementById('name-step')!;
+  const rosterEl = document.getElementById('name-roster')!;
+  const otherInput = document.getElementById('name-other-input') as HTMLInputElement;
+  const avatarPickerEl = document.getElementById('avatar-picker')!;
+  const nameStepContinue = document.getElementById('name-step-continue') as HTMLButtonElement;
   const app = document.getElementById('app')!;
-  const quickNavEl = document.getElementById('quick-nav')!;
+  const identityDisplay = document.getElementById('identity-display')!;
+  const identityChangeBtn = document.getElementById('identity-change') as HTMLButtonElement;
+  const filterBarEl = document.getElementById('filter-bar')!;
+  const bulkBar = document.getElementById('bulk-bar')!;
+  const bulkCount = document.getElementById('bulk-count')!;
+  const bulkNoteInput = document.getElementById('bulk-note') as HTMLInputElement;
+  const bulkClaimBtn = document.getElementById('bulk-claim-btn') as HTMLButtonElement;
+  const bulkClearBtn = document.getElementById('bulk-clear-btn') as HTMLButtonElement;
   const groupsEl = document.getElementById('groups')!;
   const viewChecklist = document.getElementById('view-checklist')!;
   const viewSummary = document.getElementById('view-summary')!;
-  const yourNameInput = document.getElementById('your-name') as HTMLInputElement;
-  const addItemForm = document.getElementById('add-item-form') as HTMLFormElement;
-  const addItemGroup = document.getElementById('add-item-group') as HTMLSelectElement;
-  const addItemCategory = document.getElementById('add-item-category') as HTMLInputElement;
-  const addItemName = document.getElementById('add-item-name') as HTMLInputElement;
-  const categoryOptions = document.getElementById('category-options') as HTMLDataListElement;
 
-  yourNameInput.value = localStorage.getItem(NAME_STORAGE_KEY) ?? '';
-  yourNameInput.addEventListener('input', () => {
-    localStorage.setItem(NAME_STORAGE_KEY, yourNameInput.value.trim());
+  // --- Name / avatar onboarding ---
+
+  function currentSelectedName(): string {
+    return selectedRosterName === 'OTHER' ? otherInput.value.trim() : selectedRosterName ?? '';
+  }
+
+  function updateContinueState() {
+    nameStepContinue.disabled = !currentSelectedName() || !selectedAvatar;
+  }
+
+  function refreshRosterHighlight() {
+    rosterEl.querySelectorAll('button').forEach((btn) => {
+      const isOther = btn.textContent === 'Other';
+      btn.dataset.selected = String(
+        (isOther && selectedRosterName === 'OTHER') || (!isOther && btn.textContent === selectedRosterName)
+      );
+    });
+  }
+
+  function refreshAvatarHighlight() {
+    avatarPickerEl.querySelectorAll('button').forEach((btn) => {
+      btn.dataset.selected = String(btn.textContent === selectedAvatar);
+    });
+  }
+
+  function buildNameStep() {
+    for (const name of NAME_ROSTER) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = name;
+      btn.addEventListener('click', () => {
+        selectedRosterName = name;
+        otherInput.classList.add('hidden');
+        otherInput.value = '';
+        refreshRosterHighlight();
+        updateContinueState();
+      });
+      rosterEl.appendChild(btn);
+    }
+    const otherBtn = document.createElement('button');
+    otherBtn.type = 'button';
+    otherBtn.textContent = 'Other';
+    otherBtn.addEventListener('click', () => {
+      selectedRosterName = 'OTHER';
+      otherInput.classList.remove('hidden');
+      otherInput.focus();
+      refreshRosterHighlight();
+      updateContinueState();
+    });
+    rosterEl.appendChild(otherBtn);
+
+    for (const avatar of AVATAR_OPTIONS) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = avatar;
+      btn.addEventListener('click', () => {
+        selectedAvatar = avatar;
+        refreshAvatarHighlight();
+        updateContinueState();
+      });
+      avatarPickerEl.appendChild(btn);
+    }
+
+    otherInput.addEventListener('input', updateContinueState);
+  }
+
+  function openNameStep() {
+    selectedRosterName = NAME_ROSTER.includes(myName) ? myName : myName ? 'OTHER' : null;
+    selectedAvatar = myAvatar || null;
+    if (selectedRosterName === 'OTHER') {
+      otherInput.value = myName;
+      otherInput.classList.remove('hidden');
+    } else {
+      otherInput.value = '';
+      otherInput.classList.add('hidden');
+    }
+    refreshRosterHighlight();
+    refreshAvatarHighlight();
+    updateContinueState();
+    gate.classList.add('hidden');
+    app.classList.add('hidden');
+    nameStep.classList.remove('hidden');
+  }
+
+  nameStepContinue.addEventListener('click', () => {
+    const name = currentSelectedName();
+    if (!name || !selectedAvatar) return;
+    myName = name;
+    myAvatar = selectedAvatar;
+    localStorage.setItem(NAME_STORAGE_KEY, myName);
+    localStorage.setItem(AVATAR_STORAGE_KEY, myAvatar);
+    nameStep.classList.add('hidden');
+    showApp();
+    render();
   });
+
+  identityChangeBtn.addEventListener('click', () => openNameStep());
+
+  buildNameStep();
+
+  // --- Passcode gate ---
 
   async function tryEnter(passcode: string) {
     try {
@@ -528,7 +729,12 @@
       items = data as Item[];
       storePasscode(passcode);
       await refreshAssignments();
-      showApp();
+      gate.classList.add('hidden');
+      if (myName && myAvatar) {
+        showApp();
+      } else {
+        openNameStep();
+      }
     } catch {
       return false;
     }
@@ -544,7 +750,9 @@
   }
 
   function showApp() {
+    identityDisplay.textContent = `${myAvatar} ${myName}`;
     gate.classList.add('hidden');
+    nameStep.classList.add('hidden');
     app.classList.remove('hidden');
   }
 
@@ -567,10 +775,11 @@
     });
   });
 
+  // --- Claiming ---
+
   async function claimItem(itemId: string, note: string) {
-    const name = yourNameInput.value.trim();
-    if (!name || !client) return;
-    await client.from('assignments').insert({ item_id: itemId, person_name: name, note: note || null });
+    if (!myName || !client) return;
+    await client.from('assignments').insert({ item_id: itemId, person_name: myName, avatar: myAvatar, note: note || null });
     await refreshAssignments();
   }
 
@@ -580,6 +789,36 @@
     await refreshAssignments();
   }
 
+  function updateBulkBar() {
+    const count = selectedItemIds.size;
+    bulkBar.classList.toggle('hidden', count === 0);
+    bulkCount.textContent = `${count} selected`;
+  }
+
+  bulkClaimBtn.addEventListener('click', async () => {
+    if (!client || !myName || selectedItemIds.size === 0) return;
+    const note = bulkNoteInput.value.trim();
+    const rows = Array.from(selectedItemIds).map((itemId) => ({
+      item_id: itemId,
+      person_name: myName,
+      avatar: myAvatar,
+      note: note || null,
+    }));
+    await client.from('assignments').insert(rows);
+    selectedItemIds.clear();
+    bulkNoteInput.value = '';
+    updateBulkBar();
+    await refreshAssignments();
+  });
+
+  bulkClearBtn.addEventListener('click', () => {
+    selectedItemIds.clear();
+    updateBulkBar();
+    render();
+  });
+
+  // --- Items: add / edit / remove ---
+
   async function removeItem(item: Item) {
     if (!client) return;
     await client.from('items').delete().eq('id', item.id);
@@ -588,32 +827,49 @@
     render();
   }
 
-  addItemForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!client) return;
-    const group = addItemGroup.value;
-    const category = addItemCategory.value.trim() || group;
-    const name = addItemName.value.trim();
-    if (!name) return;
+  function startEditingItem(item: Item, nameSpan: HTMLElement) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = item.name;
+    input.className = 'camp-input camp-input--sm';
+    let finished = false;
+    const finish = async (save: boolean) => {
+      if (finished) return;
+      finished = true;
+      const newName = input.value.trim();
+      input.replaceWith(nameSpan);
+      if (save && client && newName && newName !== item.name) {
+        await client.from('items').update({ name: newName }).eq('id', item.id);
+        item.name = newName;
+        nameSpan.textContent = newName;
+      }
+    };
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    });
+    input.addEventListener('blur', () => finish(true));
+    nameSpan.replaceWith(input);
+    input.focus();
+    input.select();
+  }
+
+  async function addItem(groupName: string, category: string, name: string) {
+    if (!client || !name) return;
     const sortOrder = items.reduce((max, i) => Math.max(max, i.sort_order), 0) + 1;
     const { data } = await client
       .from('items')
-      .insert({ group_name: group, category, name, sort_order: sortOrder })
+      .insert({ group_name: groupName, category, name, sort_order: sortOrder })
       .select();
     if (data) items.push(...(data as Item[]));
-    addItemName.value = '';
     render();
-  });
-
-  function render() {
-    renderCategoryOptions();
-    renderChecklist();
-    renderSummary();
   }
 
-  function renderCategoryOptions() {
-    const categories = Array.from(new Set(items.map((i) => i.category)));
-    categoryOptions.innerHTML = categories.map((c) => `<option value="${escapeHtml(c)}"></option>`).join('');
+  // --- Rendering ---
+
+  function render() {
+    renderChecklist();
+    renderSummary();
   }
 
   function escapeHtml(s: string) {
@@ -622,28 +878,44 @@
     return div.innerHTML;
   }
 
+  function renderFilterBar(groupNames: string[]) {
+    filterBarEl.innerHTML = '';
+    const allBtn = document.createElement('button');
+    allBtn.type = 'button';
+    allBtn.textContent = 'All';
+    allBtn.className = 'camp-filter' + (activeFilter === null ? ' camp-filter--active' : '');
+    allBtn.addEventListener('click', () => {
+      activeFilter = null;
+      render();
+    });
+    filterBarEl.appendChild(allBtn);
+
+    for (const groupName of groupNames) {
+      const icon = GROUP_ICONS[groupName] ?? '🏕️';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = `${icon} ${groupName}`;
+      btn.className = 'camp-filter' + (activeFilter === groupName ? ' camp-filter--active' : '');
+      btn.addEventListener('click', () => {
+        activeFilter = activeFilter === groupName ? null : groupName;
+        if (activeFilter) collapsedGroups.delete(activeFilter);
+        render();
+      });
+      filterBarEl.appendChild(btn);
+    }
+  }
+
   function renderChecklist() {
     groupsEl.innerHTML = '';
-    quickNavEl.innerHTML = '';
-    const groupNames = Array.from(new Set(items.map((i) => i.group_name))).sort(
+    const allGroupNames = Array.from(new Set(items.map((i) => i.group_name))).sort(
       (a, b) => GROUP_ORDER.indexOf(a) - GROUP_ORDER.indexOf(b)
     );
+    renderFilterBar(allGroupNames);
+    const groupNames = activeFilter ? allGroupNames.filter((g) => g === activeFilter) : allGroupNames;
 
     groupNames.forEach((groupName, groupIndex) => {
       const groupId = `group-${slugify(groupName)}`;
       const icon = GROUP_ICONS[groupName] ?? '🏕️';
-
-      const navLink = document.createElement('a');
-      navLink.href = `#${groupId}`;
-      navLink.textContent = `${icon} ${groupName}`;
-      navLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        collapsedGroups.delete(groupName);
-        const target = document.getElementById(groupId);
-        if (target instanceof HTMLDetailsElement) target.open = true;
-        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-      quickNavEl.appendChild(navLink);
 
       if (groupIndex > 0) groupsEl.appendChild(document.createElement('hr')).className = 'camp-trail';
 
@@ -676,10 +948,33 @@
         for (const item of categoryItems) {
           list.appendChild(renderItemRow(item));
         }
+        list.appendChild(renderAddRow(groupName, category));
         groupSection.appendChild(list);
       }
       groupsEl.appendChild(groupSection);
     });
+  }
+
+  function renderAddRow(groupName: string, category: string): HTMLLIElement {
+    const li = document.createElement('li');
+    li.className = 'camp-item camp-item--add';
+    const form = document.createElement('form');
+    form.className = 'camp-add-inline';
+    const input = document.createElement('input');
+    input.placeholder = '+ Add an item…';
+    input.className = 'camp-input camp-input--sm';
+    const btn = document.createElement('button');
+    btn.type = 'submit';
+    btn.textContent = 'Add';
+    btn.className = 'camp-btn camp-btn--mustard camp-btn--sm';
+    form.append(input, btn);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = input.value.trim();
+      addItem(groupName, category, name);
+    });
+    li.appendChild(form);
+    return li;
   }
 
   function renderItemRow(item: Item): HTMLLIElement {
@@ -689,10 +984,30 @@
     const left = document.createElement('div');
     left.className = 'camp-item__left';
 
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'camp-item__checkbox';
+    checkbox.title = 'Select for bulk claim';
+    checkbox.checked = selectedItemIds.has(item.id);
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) selectedItemIds.add(item.id);
+      else selectedItemIds.delete(item.id);
+      updateBulkBar();
+    });
+    left.appendChild(checkbox);
+
     const nameSpan = document.createElement('span');
     nameSpan.className = 'camp-item__name';
     nameSpan.textContent = item.name;
     left.appendChild(nameSpan);
+
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.textContent = '✏️';
+    editBtn.title = 'Edit item name';
+    editBtn.className = 'camp-item__edit';
+    editBtn.addEventListener('click', () => startEditingItem(item, nameSpan));
+    left.appendChild(editBtn);
 
     const removeItemBtn = document.createElement('button');
     removeItemBtn.type = 'button';
@@ -708,14 +1023,14 @@
     left.appendChild(removeItemBtn);
 
     const itemAssignments = assignments.filter((a) => a.item_id === item.id);
-    const myName = yourNameInput.value.trim().toLowerCase();
     itemAssignments.forEach((a, index) => {
       const chip = document.createElement('span');
       chip.className = 'camp-chip';
       chip.style.setProperty('--chip-rotate', index % 2 === 0 ? '-2deg' : '2deg');
       if (!previousAssignmentIds.has(a.id)) chip.classList.add('camp-chip--new');
-      chip.textContent = `🔥 ${a.person_name}` + (a.note ? ` — ${a.note}` : '');
-      if (a.person_name.trim().toLowerCase() === myName) {
+      const avatarPrefix = a.avatar ? `${a.avatar} ` : '';
+      chip.textContent = `${avatarPrefix}🔥 ${a.person_name}` + (a.note ? ` — ${a.note}` : '');
+      if (a.person_name.trim().toLowerCase() === myName.trim().toLowerCase()) {
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
         removeBtn.textContent = '×';
@@ -747,14 +1062,19 @@
     return li;
   }
 
+  const SUMMARY_ICONS = ['🎒', '🥾', '🧭', '🔥', '🌲', '⭐'];
+
   function renderSummary() {
     viewSummary.innerHTML = '';
-    const byPerson = new Map<string, { assignmentId: string; itemName: string; note: string | null }[]>();
+    const byPerson = new Map<
+      string,
+      { assignmentId: string; itemName: string; note: string | null; avatar: string | null }[]
+    >();
     for (const a of assignments) {
       const item = items.find((i) => i.id === a.item_id);
       if (!item) continue;
       const list = byPerson.get(a.person_name) ?? [];
-      list.push({ assignmentId: a.id, itemName: item.name, note: a.note });
+      list.push({ assignmentId: a.id, itemName: item.name, note: a.note, avatar: a.avatar });
       byPerson.set(a.person_name, list);
     }
     if (byPerson.size === 0) {
@@ -762,14 +1082,14 @@
         '<p class="text-[var(--camp-forest-deep)]">🌲 Nobody has claimed anything yet.</p>';
       return;
     }
-    const myName = yourNameInput.value.trim().toLowerCase();
     Array.from(byPerson.entries())
       .sort((a, b) => a[0].localeCompare(b[0]))
       .forEach(([person, claimed], index) => {
         const section = document.createElement('div');
         const heading = document.createElement('h3');
         heading.className = 'camp-summary-person';
-        heading.textContent = `${SUMMARY_ICONS[index % SUMMARY_ICONS.length]} ${person}`;
+        const avatar = claimed[0]?.avatar;
+        heading.textContent = `${avatar ?? SUMMARY_ICONS[index % SUMMARY_ICONS.length]} ${person}`;
         section.appendChild(heading);
         const list = document.createElement('ul');
         list.className = 'camp-summary-list';
@@ -778,7 +1098,7 @@
           const textSpan = document.createElement('span');
           textSpan.textContent = c.itemName + (c.note ? ` — ${c.note}` : '');
           li.appendChild(textSpan);
-          if (person.trim().toLowerCase() === myName) {
+          if (person.trim().toLowerCase() === myName.trim().toLowerCase()) {
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.textContent = '✕';
