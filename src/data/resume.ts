@@ -21,7 +21,7 @@ export type Certification = {
 };
 
 export const summary =
-  'Senior Machine Learning Engineer with 4+ years delivering production NLP, LLM, and agentic AI systems in healthcare and insurance domains. Proven track record of building scalable ML pipelines, self-hosting open-source LLMs on multi-node GPU clusters, and driving measurable operational impact across cross-functional teams. Experienced across Azure, Databricks, and GCP environments with a strong foundation in distributed systems and end-to-end ML delivery.';
+  'Senior Machine Learning Engineer with 4+ years shipping production NLP, LLM, and agentic AI systems, including five client AI systems built in the past year for government, engineering, industrial, and online-community clients. Takes agentic LLM applications from technical design to production: human-in-the-loop LangGraph pipelines, MCP tool servers, source-cited generation, and CI-gated evaluation. Earlier NLP work generated $1M+ in annual savings per deployment in healthcare and insurance. Deep hands-on experience across Azure, Databricks, and GCP, from self-hosted LLMs on multi-node GPU clusters to full-stack delivery.';
 
 export const experience: Experience[] = [
   {
@@ -30,9 +30,13 @@ export const experience: Experience[] = [
     period: 'Oct 2025 — Present',
     location: 'Edmonton, AB',
     bullets: [
-      "Architected agentic AI workflows on the company's proprietary platform using LangGraph and MCP (Model Context Protocol), enabling LLM agents to autonomously orchestrate multi-step tasks across external APIs and services — reducing manual intervention in complex workflows.",
-      'Owned backend integration for a client-facing community platform, designing OAuth2/JWT authentication flows, token lifecycle management, and user attribution across distributed service layers to meet enterprise security requirements.',
-      'Applied distributed systems patterns — including Postgres-backed task queues, server-sent events, and idempotent write-back with human-in-the-loop checkpoints — to harden ML pipelines for production reliability.',
+      'Sole engineer, from technical design to release, on a rules-as-code eligibility engine for a provincial government: encoded 26 published regulatory rules as auditable predicates, traced every determination back to its source rule, streamed results in real time over SSE, and gated each release on an automated evaluation suite.',
+      'Primary engineer on an agentic RFP-generation platform for an industrial services client that turns a scope of work into per-trade tender packages. Built a LangGraph pipeline with a human-in-the-loop estimator review and source-cited generation on FastAPI, async Postgres, and Next.js.',
+      "Architected and led delivery of an AI report writer for an engineering consultancy. Authored the technical design, integrated document-extraction and document-generation services with an append-only provenance store, generated reports in the firm's branded Word templates, and shipped to staging, UAT, and production on Azure Container Apps with Entra ID authentication.",
+      "Built four MCP servers on the company's proprietary agentic platform, spanning a data warehouse, forum read/write access, and a REST hub, with role-based access control. Added a ReAct investigation agent with citation guards and audit logging so LLM agents can triage spam and scams for an online community platform.",
+      'Built evaluation and feedback loops into production LLM systems: user ratings sent to Arize as evals, AI-assisted section rewrites, and analysis of 300+ UAT user edits to pinpoint extraction errors. Profiled 33 production runs to find the source of slow requests, and made a specification matcher 18x faster with no change in output.',
+      'Took an ML anomaly-detection pipeline to production for a government ministry on Databricks and Azure Functions, adding resilient session recovery, streamed queries, a scoring window narrowed from 12 to 4 months, and supervised evaluation orchestrated in LangGraph.',
+      'Set engineering standards as technical reviewer across multiple client codebases, driving adoption of the shared platform, pre-deploy migration gates in CD, and parallel code review with AI agents.',
     ],
   },
   {
@@ -99,7 +103,7 @@ export const volunteer: Experience[] = [
 export const skillGroups: { title: string; items: string[] }[] = [
   {
     title: 'Languages',
-    items: ['Python', 'PySpark', 'SQL'],
+    items: ['Python', 'TypeScript', 'PySpark', 'SQL'],
   },
   {
     title: 'LLM Ecosystem',
@@ -110,7 +114,9 @@ export const skillGroups: { title: string; items: string[] }[] = [
       'Anthropic API',
       'LangGraph',
       'MCP',
+      'LiteLLM',
       'LangSmith',
+      'Arize',
     ],
   },
   {
@@ -119,10 +125,23 @@ export const skillGroups: { title: string; items: string[] }[] = [
   },
   {
     title: 'Architectures',
-    items: ['RAG', 'Hybrid Search', 'Agentic Workflows', 'Fine-Tuning'],
+    items: ['RAG', 'Hybrid Search', 'Agentic Workflows', 'Human-in-the-Loop', 'Fine-Tuning', 'LLM Evaluation'],
+  },
+  {
+    title: 'Web & Data',
+    items: ['FastAPI', 'Next.js', 'Postgres', 'pgvector', 'SQLAlchemy', 'BigQuery', 'Playwright'],
   },
   {
     title: 'Infrastructure & MLOps',
-    items: ['Databricks', 'MLflow', 'Docker', 'Azure', 'GCP'],
+    items: [
+      'Databricks',
+      'MLflow',
+      'Docker',
+      'Azure Container Apps',
+      'Azure Functions',
+      'Entra ID',
+      'GitHub Actions',
+      'GCP',
+    ],
   },
 ];
