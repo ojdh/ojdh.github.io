@@ -19,7 +19,7 @@ You can use the usual Markdown features:
 
 - Bullet lists
 - **Bold** and *italic* text
-- [Links](https://ojdh.github.io)
+- [Links](https://ojdh.ca)
 
 > Blockquotes look like this.
 
