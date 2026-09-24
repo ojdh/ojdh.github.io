@@ -10,7 +10,7 @@ export const site = {
   intro:
     'I build software and machine learning systems. Off the clock, I make photographs and play soccer.',
   email: 'ojaswi.365@gmail.com',
-  url: 'https://ojdh.github.io',
+  url: 'https://ojdh.ca',
   location: 'Edmonton, Canada',
 } as const;
 
